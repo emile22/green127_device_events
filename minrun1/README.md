@@ -16,19 +16,35 @@ accounting or network management protocols.
 
 ## Requirements
 
-Python 3.10 or newer and pip. The project does not pin an interpreter version,
-create a virtual environment, or add an editor interpreter-selection setting;
-commands use the `python` executable selected in the current shell.
+Python 3.11 and pip. The project is pinned to Python 3.11 and the VS Code
+workspace is configured to use `minrun1/.venv/Scripts/python.exe` on Windows.
 
 ## Install
 
 From the `minrun1` directory:
 
 ```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[test]"
 ```
 
-This installs the local package in editable mode and the pytest test extra.
+This creates the Python 3.11 environment, then installs the local package in
+editable mode with the pytest test extra.
+
+The runtime flow is:
+
+```text
+__main__.py
+	|
+	+-- interactive runtime / CLI only
+	|
+	+--> simulator.py
+		   |
+		   +--> measurements
+					|
+					+--> accounting.py
+```
 
 ## Run
 
@@ -83,8 +99,11 @@ python run.py
 ```
 
 `run.py` uses the same interpreter for both steps and starts the runtime only
-if every test passes. Runtime tests provide scripted input and a no-op sleeper,
-so they never block for user input or wait for real-time delays.
+if every test passes. Tests MUST NOT call `input()` or depend on `sleep()` or
+real-time delays. They use scripted input and a no-op sleeper; the simulator
+and accounting engine are callable directly from tests.
+After the runtime exits, `run.py` waits for ENTER so the complete console trace
+remains available to review. It also pauses after a test failure before exiting.
 
 The console shows the test names and results first, followed by the runtime
 prompt:
@@ -96,15 +115,17 @@ tests/test_runtime.py::test_a_runs_remaining_events_without_prompting_again PASS
 tests/test_runtime.py::test_q_stops_without_running_the_next_event PASSED
 tests/test_runtime.py::test_r_restarts_at_t0_and_returns_to_interactive_mode PASSED
 tests/test_runtime.py::test_auto_starts_without_reading_input PASSED
+tests/test_runtime.py::test_review_pause_waits_for_enter PASSED
 tests/test_simulator.py::test_pdu_scenario_emits_deterministic_measurements PASSED
 tests/test_simulator.py::test_unknown_scenario_is_rejected PASSED
-============================== 8 passed ==============================
+============================== 9 passed ==============================
 All tests passed. Starting the GREEN runtime...
 GREEN demo starting...
 [ENTER] next event
 a       automatically run all remaining events
 q       quit
 r       restart scenario
+GREEN runtime ended. Press ENTER to close and review the trace...
 ```
 
 ## Project Files
@@ -115,5 +136,5 @@ r       restart scenario
 - `src/green/accounting.py`: demo-only boundary-meter arithmetic.
 - `src/green/__main__.py`: interactive and automatic console runtime.
 - `tests/`: accounting, simulator, and runtime tests.
-- `prompts/green_minimal_runtime_implementation.md`: implementation prompt used
+- `prompts/green_minimal_runtime_implementation.prompt.md`: implementation prompt used
 	for this project.

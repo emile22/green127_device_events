@@ -1,5 +1,6 @@
 from green.__main__ import main, run_demo
 from green.simulator import generate_events
+from run import pause_for_review
 
 
 def run_with_commands(commands: list[str]) -> tuple[list[str], list[float]]:
@@ -74,3 +75,15 @@ def test_auto_starts_without_reading_input() -> None:
     assert sleep_calls == [0.5, 0.5, 0.5]
     assert "T0  naive=600  accounted=300" in output
     assert "Topology:          complete" in output
+
+
+def test_review_pause_waits_for_enter() -> None:
+    prompts: list[str] = []
+
+    def fake_input(prompt: str) -> str:
+        prompts.append(prompt)
+        return ""
+
+    pause_for_review("Press ENTER to close", fake_input)
+
+    assert prompts == ["Press ENTER to close"]

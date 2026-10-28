@@ -38,8 +38,8 @@ green/
 │       └── __main__.py
 └── tests/
     ├── test_accounting.py
-  ├── test_simulator.py
-  └── test_runtime.py
+    ├── test_simulator.py
+    └── test_runtime.py
 ```
 
 The important addition compared with the previous prompt is:
@@ -80,14 +80,20 @@ T3 TRAFFIC_BURST
 For each event:
 
 ```text
-Event
-  ↓
-Simulator generates measurements
-  ↓
-AccountingEngine.compute(boundary, measurements, topology)
-  ↓
-Console displays result
+__main__.py
+    |
+    +-- interactive runtime / CLI only
+    |
+    +--> simulator.py
+           |
+           +--> measurements
+                    |
+                    +--> accounting.py
 ```
+
+`__main__.py` controls the CLI and presentation. The simulator produces raw
+measurements, and the accounting engine interprets those measurements. Keep
+these responsibilities separate.
 
 Example output:
 
@@ -140,23 +146,18 @@ GREEN demo completed.
 
 ## Minimal Python environment
 
-Use a virtual environment:
+Pin the project to Python 3.11 because the VS Code workspace uses the `.venv`
+interpreter. Create the environment from a Python 3.11 interpreter:
 
 ```powershell
-cd green
-
+cd minrun1
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-
-python -m pip install --upgrade pip
-pip install pytest
+python -m pip install -e ".[test]"
 ```
 
-Then make the project installable:
-
-```powershell
-pip install -e .
-```
+Configure the VS Code workspace to use `minrun1/.venv/Scripts/python.exe` on
+Windows. Set `requires-python` in `pyproject.toml` to `==3.11.*`.
 
 The runtime becomes:
 
@@ -180,7 +181,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "green"
 version = "0.1.0"
-requires-python = ">=3.11"
+requires-python = "==3.11.*"
 
 [project.optional-dependencies]
 test = ["pytest>=8"]
@@ -275,10 +276,13 @@ This runs all events from T0 in automatic mode. Keep the CLI small; support
 `--auto`, `--interval`, and `--scenario pdu`. Allow `--interval 0` to disable
 automatic delays.
 
+Tests MUST NOT call `input()`.
+Tests MUST NOT depend on `sleep()` or real-time delays.
+The simulator and accounting engine must be callable directly from tests.
+
 Keep the event runner independently testable by injecting its input and sleep
-functions (or equivalent test seams). Unit tests must use scripted input and a
-no-op sleep function; they must never wait for real user input or real-time
-delays. Cover next-event stepping, automatic completion, clean quit, restart,
+functions (or equivalent test seams). Use scripted input and a no-op sleep
+function. Cover next-event stepping, automatic completion, clean quit, restart,
 and automatic startup with no input.
 
 ## Acceptance criterion
