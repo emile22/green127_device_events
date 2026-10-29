@@ -240,4 +240,5 @@ energy/state, UC 2.1 partial deployment, and UC 2.14 resilience data.
 - `yang/`: original GREEN, RFC 8348, and RFC 6991 modules.
 - `examples/`: representative RFC 7951-shaped hardware and PDU data.
 - `tests/`: accounting, topology, simulator, and runtime behavior.
-- `prompts/green_minimal_yang_adapter.prompt.md`: implementation prompt.
+- `prompts/green4_minimal_netconf_4_UCs.prompt.md`: minrun4 implementation prompt.
+- `prompts/green3_minimal_yang_adapter.prompt.md`: preceding YANG adapter prompt.

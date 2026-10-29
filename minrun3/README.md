@@ -4,6 +4,13 @@
 adapter between its Python models and the actual GREEN/RFC 8348 YANG schemas.
 It stops before NETCONF, RESTCONF, YANG Push, or device-control integration.
 
+## Relationship to minrun4
+
+`minrun4` builds on this runtime and adapter. It retains UC 2.13 and UC 2.10,
+adds UC 2.1 and UC 2.14 for 17 events total, and adds a native, read-only
+Sysrepo/Netopeer2 NETCONF layer with ncclient smoke tests. Those additions are
+in the separate `minrun4/` project; `minrun3` itself remains NETCONF-free.
+
 ## Runtime Flow
 
 ```text
@@ -172,4 +179,4 @@ existing UC 2.13 accounting result.
 - `yang/`: original GREEN, RFC 8348, and RFC 6991 modules.
 - `examples/`: representative RFC 7951-shaped hardware and PDU data.
 - `tests/`: accounting, topology, simulator, and runtime behavior.
-- `prompts/green_minimal_yang_adapter.prompt.md`: implementation prompt.
+- `prompts/green3_minimal_yang_adapter.prompt.md`: implementation prompt.

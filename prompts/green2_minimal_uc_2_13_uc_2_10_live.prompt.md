@@ -4,7 +4,7 @@ Act as a senior Python and network-management implementation engineer with YANG 
 
 Work in the currently opened local `green` repository.
 
-A minimal runnable runtime should already exist from `green_minimal_runtime_implementation.prompt.md`.
+A minimal runnable runtime should already exist from `green1_minimal_runtime_implementation.prompt.md`.
 
 This increment MUST **reuse and extend the existing runtime**. Preserve working code, tests, project structure, and CLI behavior unless a small refactor is required to introduce the real accounting and event models.
 
@@ -21,7 +21,7 @@ The goal is to replace any placeholder accounting/runtime data with the smallest
 - **UC 2.13 — Double Accounting**
 - **UC 2.10 — Fixed Network Energy Saving**, using deterministic live-like traffic events and energy-consumption variation.
 
-Do not implement real YANG modules in this increment. The next step will be `green_minimal_yang_adapter.prompt.md`.
+Do not implement real YANG modules in this increment. The next step will be `green3_minimal_yang_adapter.prompt.md`.
 
 Do not implement NETCONF, RESTCONF, YANG Push, sysrepo, Netopeer2, capability discovery, UC 2.1, persistence, Docker, or a web UI.
 
@@ -990,4 +990,4 @@ Stop after UC 2.13 + UC 2.10 are working as two ordered runtime event series.
 
 Do not continue automatically to YANG integration.
 
-The next implementation increment is `green_minimal_yang_adapter.prompt.md`.
+The next implementation increment is `green3_minimal_yang_adapter.prompt.md`.
