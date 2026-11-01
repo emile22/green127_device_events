@@ -1,0 +1,17 @@
+# Capability-Discovery Readiness for Future caprun
+
+This is a stable-identity readiness inventory only. allrun51 does not implement RFC 9196, `ietf-system-capabilities`, `ietf-power-state-capabilities`, capability callbacks, or capability-gated control. UC 2.11 classification remains simulator/controller metadata.
+
+The selected Energy Objects map to RFC 8348 Components by the existing `source-component-id` leafref. Device ID, component name, UUID, and Energy Object ID remain distinct.
+
+| Device ID | Hardware component | UUID | Device archetype | Topology | Energy Object ID | source-component-id | Relevant relationships | UCs | Future capability-profile class | Reason |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `router-A` | `linecard-1` | `00000000-0000-4000-8000-000000000011` | `fixed-router` | T1-fixed-network, T3-power-infrastructure, T4-wireless-transport | `eo-router-a-linecard-1` | `linecard-1` | eo-router-a-linecard-1 enabled-by eo-switch-fabric; eo-switch-fabric enabling eo-router-a-linecard-1 | UC 2.1, UC 2.2, UC 2.10, UC 2.11, UC 2.16 | `router-linecard` | Stable line-card identity supports a future router power-state profile. |
+| `wlan-1` | `ap-baseband` | `00000000-0000-4000-8000-000000000044` | `wlan-access` | T2-wlan-poe | `eo-ap-baseband` | `ap-baseband` | eo-ap-baseband enabling eo-ap-radio-24; eo-ap-baseband enabling eo-ap-radio-5; eo-ap-radio-24 enabled-by eo-ap-baseband; eo-ap-radio-5 enabled-by eo-ap-baseband | UC 2.9 | `ap-baseband` | Stable AP subsystem identity for future radio/baseband profiles. |
+| `wlan-1` | `ap-radio-24` | `00000000-0000-4000-8000-000000000045` | `wlan-access` | T2-wlan-poe | `eo-ap-radio-24` | `ap-radio-24` | eo-ap-baseband enabling eo-ap-radio-24; eo-ap-radio-24 enabled-by eo-ap-baseband | UC 2.9 | `ap-radio` | Existing 2.4 GHz radio component exercises per-radio power modes. |
+| `wlan-1` | `ap-radio-5` | `00000000-0000-4000-8000-000000000046` | `wlan-access` | T2-wlan-poe | `eo-ap-radio-5` | `ap-radio-5` | eo-ap-baseband enabling eo-ap-radio-5; eo-ap-radio-5 enabled-by eo-ap-baseband | UC 2.9 | `ap-radio` | Existing 5 GHz radio component exercises per-radio power modes. |
+| `transport-site-1` | `transport-module` | `00000000-0000-4000-8000-000000000102` | `wireless-transport` | T4-wireless-transport | `eo-transport-module` | `transport-module` | eo-dependent-ip-function enabled-by eo-transport-module; eo-router-a enabled-by eo-transport-module; eo-transport-module enabling eo-dependent-ip-function; eo-transport-module enabling eo-router-a | UC 2.7, UC 2.16 | `transport-radio-module` | Transport module anchors future underlay and radio capability profiles. |
+| `ai-training-node-1` | `ai-node-1-nic` | `00000000-0000-4000-8000-000000000112` | `compute-node` | T5-edge-compute | `eo-ai-node-1-nic-1` | `ai-node-1-nic` | none currently modeled | UC 2.15 | `server-nic` | Stable compute-node NIC identity is separate from workload event state. |
+| `smart-city-site-1` | `radar-sensor-1` | `00000000-0000-4000-8000-000000000062` | `isac-roadside-unit` | T6-isac-smart-city | `eo-radar-sensor` | `radar-sensor-1` | eo-isac-energy-aggregator aggregating eo-radar-sensor; eo-radar-sensor aggregated-by eo-isac-energy-aggregator | UC 2.12 | `isac-sensing-component` | Existing radar sensor is an ISAC sensing capability attachment point. |
+
+Future capability data belongs to a separate caprun increment. No RFC 9196 capability values are implemented or implied here.
