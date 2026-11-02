@@ -1,8 +1,10 @@
+import threading
 import xml.etree.ElementTree as ET
 
 from green.simulator import EventSimulator
 from green.yang_adapter import to_yang_instance
 from green.topology import demo_energy_objects
+from green.netconf_trace import NetconfTraceTailer
 
 
 HARDWARE_NS = "urn:ietf:params:xml:ns:yang:ietf-hardware"
@@ -21,6 +23,71 @@ def publish(event) -> None:
     from green.netconf_bridge import write_operational_snapshot
 
     write_operational_snapshot(event)
+
+
+def test_netconf_get_is_written_to_provider_trace(netconf_manager) -> None:
+    from green.netconf_bridge import set_netconf_trace_enabled
+
+    trace_path = set_netconf_trace_enabled(True)
+    formatted_records: list[str] = []
+    record_received = threading.Event()
+
+    def capture_record(record: str) -> None:
+        formatted_records.append(record)
+        if "<get> | OK" in record:
+            record_received.set()
+
+    tailer = NetconfTraceTailer(trace_path, capture_record)
+    tailer.start()
+    try:
+        publish(event_at("U13-1"))
+        get_energy_objects(netconf_manager)
+        assert record_received.wait(timeout=5), "live trace did not receive the NETCONF GET"
+        trace = trace_path.read_text(encoding="utf-8")
+    finally:
+        set_netconf_trace_enabled(False)
+        tailer.stop()
+
+    assert "operation: <get>" in trace
+    assert "module: ietf-power-and-energy" in trace
+    assert "request-xpath:" in trace
+    assert "------------------------------------------------------------------------" in trace
+    assert "UC 2.13 - Double Accounting | U13-1 TOPOLOGY_DISCOVERED" in trace
+    get_record = next(record for record in formatted_records if "<get> | OK" in record)
+    assert "GREEN ENERGY OBJECTS" in get_record
+    assert "eo-upstream-meter" in get_record
+    assert "UC 2.13 - Double Accounting | U13-1 TOPOLOGY_DISCOVERED" in get_record
+    assert "upstream-meter" in get_record
+    assert "METERING(2)" in get_record
+
+
+def test_hardware_get_is_prettified_as_inventory(netconf_manager) -> None:
+    from green.netconf_bridge import set_netconf_trace_enabled
+
+    trace_path = set_netconf_trace_enabled(True)
+    records: list[str] = []
+    inventory_received = threading.Event()
+
+    def capture_record(record: str) -> None:
+        records.append(record)
+        if "Reply: HARDWARE INVENTORY" in record:
+            inventory_received.set()
+
+    tailer = NetconfTraceTailer(trace_path, capture_record)
+    tailer.start()
+    try:
+        publish(event_at("U13-1"))
+        get_hardware(netconf_manager)
+        assert inventory_received.wait(timeout=5), "hardware GET did not render an inventory"
+    finally:
+        set_netconf_trace_enabled(False)
+        tailer.stop()
+
+    inventory = next(record for record in records if "Reply: HARDWARE INVENTORY" in record)
+    assert "Component" in inventory and "Class" in inventory and "UUID" in inventory
+    assert "upstream-meter" in inventory and "energy-object" in inventory
+    assert "...0001" in inventory
+    assert all(len(line) <= 72 for line in inventory.splitlines())
 
 
 def get_hardware(netconf_manager):
@@ -151,6 +218,17 @@ def test_uc21_partial_deployment_exposes_only_measured_component(netconf_manager
     assert leaf(legacy_linecard, "energy", "total-energy-consumed") is None
 
 
+def test_uc21_device_and_mixed_network_migration_are_visible(netconf_manager) -> None:
+    publish(event_at("U1-2"))
+    device_objects = get_energy_objects(netconf_manager)
+    assert leaf(device_objects["eo-router-a"], "power", "instantaneous-power") == "420000"
+
+    publish(event_at("U1-3"))
+    mixed_objects = get_energy_objects(netconf_manager)
+    assert leaf(mixed_objects["eo-router-a"], "power", "instantaneous-power") == "420000"
+    assert leaf(mixed_objects["eo-router-b"], "power", "instantaneous-power") == "380000"
+
+
 def test_uc214_grid_failure_critical_service_and_recovery_are_read_only(netconf_manager) -> None:
     publish(event_at("U14-1"))
     failed_grid_objects = get_energy_objects(netconf_manager)
@@ -165,6 +243,9 @@ def test_uc214_grid_failure_critical_service_and_recovery_are_read_only(netconf_
     critical_objects = get_energy_objects(netconf_manager)
     assert power_state(critical_objects["eo-router-a"]) == "power-state-on"
     assert power_state(critical_objects["eo-router-b"]) == "power-state-sleep"
+    assert power_state(critical_objects["eo-router-b-non-critical-port"]) == "power-state-off"
+    assert leaf(critical_objects["eo-router-a"], "power", "instantaneous-power") == "380000"
+    assert leaf(critical_objects["eo-router-b"], "power", "instantaneous-power") == "200000"
 
     publish(event_at("U14-4"))
     restored_objects = get_energy_objects(netconf_manager)

@@ -72,9 +72,18 @@ Keep:
 ```text
 [ENTER] next event
 a       automatically run all remaining events
+d       toggle live NETCONF operational-data trace
 r       restart the complete demo
 q       quit
 ```
+
+When `d` is enabled, display each Sysrepo operational-data request path and
+the returned YANG data for NETCONF `<get>` as a readable live UI trace, while
+also appending the records to a local ignored log. Log every runtime snapshot
+as well as each `<get>`, so all UC events appear even without a NETCONF client.
+Separate each record with a dash line and label it with the current UC and event
+title. Disable tracing by pressing `d` again. Do not log credentials or claim
+this is a full SSH wire capture.
 
 The NETCONF layer is an additional management interface.
 

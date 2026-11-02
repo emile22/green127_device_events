@@ -40,6 +40,8 @@ class EnergyObject:
     energy_object_id: str
     hardware_component_name: str | None
     hardware_component_uuid: str | None
+    hardware_parent_name: str | None = None
+    hardware_parent_rel_pos: int | None = None
 
 
 @dataclass(frozen=True)

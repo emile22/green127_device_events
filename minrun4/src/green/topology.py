@@ -141,12 +141,16 @@ def demo_energy_objects() -> tuple[EnergyObject, ...]:
             LINECARD_1_ID,
             "linecard-1",
             "00000000-0000-4000-8000-000000000011",
+                "router-A",
+                1,
         ),
         EnergyObject(
             "router-A",
             LINECARD_2_ID,
             "linecard-2",
             "00000000-0000-4000-8000-000000000012",
+                "router-A",
+                2,
         ),
         EnergyObject(
             "router-B",
@@ -159,6 +163,8 @@ def demo_energy_objects() -> tuple[EnergyObject, ...]:
             NON_CRITICAL_PORT_ID,
             "non-critical-port",
             "00000000-0000-4000-8000-000000000021",
+            "router-B",
+            1,
         ),
     )
 

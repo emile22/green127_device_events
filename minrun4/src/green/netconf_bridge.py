@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime, timezone
 from pathlib import Path
 
 from green.models import SimulatedEvent
@@ -31,7 +32,71 @@ def write_operational_snapshot(
         event.power_measurements,
     )
     destination.parent.mkdir(parents=True, exist_ok=True)
+    trace_enabled_path = Path(f"{destination}.netconf-trace-enabled")
+    try:
+        trace_enabled = trace_enabled_path.read_text(encoding="ascii").strip() == "1"
+    except FileNotFoundError:
+        trace_enabled = False
+
+    series_titles = {
+        "UC 2.13": "Double Accounting",
+        "UC 2.10": "Fixed Network Energy Saving",
+        "UC 2.1": "Incremental GREEN Deployment",
+        "UC 2.14": "Power Shortage / Resilience",
+    }
+    series = event.series.value
+    title = series_titles.get(series, series)
+    if trace_enabled:
+        context_path = Path(f"{destination}.netconf-context")
+        temporary_context_path = context_path.with_suffix(context_path.suffix + ".tmp")
+        temporary_context_path.write_text(
+            f"{series} - {title} | {event.sequence} {event.name}\n",
+            encoding="utf-8",
+        )
+        temporary_context_path.replace(context_path)
     temporary_path = destination.with_suffix(destination.suffix + ".tmp")
     temporary_path.write_text(json.dumps(snapshot, indent=2) + "\n", encoding="utf-8")
     temporary_path.replace(destination)
+    if trace_enabled:
+        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        trace_path = Path(f"{destination}.netconf-trace.log")
+        with trace_path.open("a", encoding="utf-8", newline="\n") as trace_file:
+            trace_file.write(
+                "------------------------------------------------------------------------\n"
+                f"{series} - {title} | {event.sequence} {event.name}\n"
+                "------------------------------------------------------------------------\n"
+                f"[{timestamp}] GREEN runtime snapshot published\n"
+                "operation: runtime snapshot\n"
+                "module: GREEN simulator\n"
+                "path: /green/scenario/current\n"
+                "request-xpath: (runtime event)\n"
+                "status: published\n"
+                "reply-data-json:\n"
+                f"{json.dumps(snapshot, indent=2)}\n\n"
+            )
     return destination
+
+
+def set_netconf_trace_enabled(
+    enabled: bool,
+    destination: Path | None = None,
+) -> Path:
+    """Toggle provider tracing and return the path of its message log."""
+    if destination is None:
+        configured_path = os.environ.get("GREEN_NETCONF_STATE_FILE")
+        destination = (
+            Path(configured_path)
+            if configured_path
+            else Path(__file__).resolve().parents[2]
+            / "state"
+            / "netconf"
+            / "operational.json"
+        )
+
+    control_path = Path(f"{destination}.netconf-trace-enabled")
+    trace_path = Path(f"{destination}.netconf-trace.log")
+    control_path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path = control_path.with_suffix(control_path.suffix + ".tmp")
+    temporary_path.write_text("1\n" if enabled else "0\n", encoding="ascii")
+    temporary_path.replace(control_path)
+    return trace_path

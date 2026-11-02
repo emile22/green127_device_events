@@ -62,6 +62,34 @@ The Python smoke-test fixture reads `NETCONF_HOST`, `NETCONF_PORT`,
 `NETCONF_USERNAME`, and `NETCONF_PASSWORD` from that file when the process
 environment does not already define them. Do not commit credentials.
 
+## WSL NETCONF Services
+
+The Windows Python environment runs the GREEN simulator, writes
+`state/netconf/operational.json`, and runs the `ncclient` smoke tests. WSL owns
+the native NETCONF server stack: Sysrepo stores the installed YANG modules,
+`sysrepo-plugind` loads the GREEN operational-data provider and reads the
+shared snapshot, and Netopeer2 serves NETCONF over SSH on TCP port 830. The
+Python runtime drives scenario progression; the WSL services expose its latest
+snapshot to NETCONF clients.
+
+Run the lifecycle scripts from the `minrun4` directory in WSL:
+
+```bash
+bash scripts/wsl-netconf-status.sh
+bash scripts/wsl-netconf-stop.sh
+bash scripts/wsl-netconf-start.sh
+```
+
+`status` reports whether `sysrepo-plugind` and `netopeer2` are running, lists
+the installed GREEN/hardware modules, and shows the port-830 listener. `stop`
+stops both services and removes their transient plugin-path environment; it
+does not uninstall YANG modules or delete host keys, snapshots, trace logs, or
+`state/netconf/connection.env`. Run `start` to restart the stack. It rebuilds
+the provider, reinstalls any missing modules, restores the service environment,
+and restarts both services. Each `start` also generates a fresh smoke-test
+password and updates `connection.env`; subsequent tests read the new values
+from that file unless overridden by process environment variables.
+
 ## Interactive Runtime
 
 Run the existing test-first launcher:
@@ -70,14 +98,26 @@ Run the existing test-first launcher:
 python run.py
 ```
 
-It prints verbose test names first and starts the runtime only if all tests
-pass. The runtime runs UC 2.13, UC 2.10, UC 2.1, then UC 2.14 and preserves
-the existing controls:
+Before testing, the launcher checks that Sysrepo, Netopeer2, the YANG module,
+and TCP/830 are healthy. If not, it runs `scripts/wsl-netconf-start.sh`; a
+startup failure prevents pytest from running. Startup refreshes the local smoke
+credential in `state/netconf/connection.env`. The launcher prints verbose test
+names and starts the runtime only if all tests pass. The runtime runs UC 2.13,
+UC 2.10, UC 2.1, then UC 2.14 and preserves the existing controls:
+
+When `run.py` exits, it stops the WSL NETCONF services using
+`scripts/wsl-netconf-stop.sh`, including when tests fail or the runtime exits.
+Start them again with `bash scripts/wsl-netconf-start.sh` from WSL. To keep the
+services running after the demo, run `python -m green` directly instead of
+using `run.py`.
+
+For a noninteractive test-first run, use `python run.py --auto --interval 0`.
 
 | Input | Behavior |
 | --- | --- |
 | ENTER | Run only the next event, then pause again. |
 | `a` | Run all remaining events automatically. |
+| `d` | Toggle live, formatted NETCONF GET tracing and append records to the local trace log. |
 | `r` | Restart the complete demo at `U13-0`, resetting topology, component state, and cumulative counters. |
 | `q` | Stop cleanly. |
 
@@ -199,6 +239,18 @@ The Sysrepo provider publishes those snapshots as operational data when
 Netopeer2 requests `<get>`. Scenario progression remains in the Python runtime.
 The NETCONF layer does not accept writes or drive scenario state.
 
+In interactive mode, press `d` to toggle NETCONF operational-data tracing.
+The provider appends each `<get>` data request's XPath and returned YANG JSON to
+`state/netconf/operational.json.netconf-trace.log`. While tracing is enabled,
+the runtime also records every published scenario snapshot, so all four UCs
+appear even when no NETCONF client requests a `<get>`. The runtime tails new
+records and displays a compact formatted request/reply or snapshot live. Each
+record starts with a dashed separator and the current UC/event title. This is a
+provider-level trace, not a capture of SSH framing or the complete NETCONF wire
+exchange.
+Tracing is disabled when the runtime starts; the log is local state and must
+not be committed.
+
 The start script installs the exact YANG revisions and required crypt-hash
 feature before starting Sysrepo and Netopeer2. Run the live read-only smoke
 tests from Windows with:
@@ -207,10 +259,10 @@ tests from Windows with:
 .\scripts\run-netconf-smoke.ps1
 ```
 
-Stop the native services from WSL with `bash scripts/wsl-netconf-stop.sh`.
-The operational provider and service scripts are local/native; they do not
-use Docker. NETCONF tests issue `<get>` only and do not send configuration
-changes.
+The operational provider and service scripts are local/native; they do not use
+Docker. For WSL service lifecycle and persistence details, see
+[WSL NETCONF Services](#wsl-netconf-services). NETCONF tests issue `<get>` only
+and do not send configuration changes.
 
 ## Tests
 

@@ -4,15 +4,93 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <libyang/libyang.h>
 #include <sysrepo.h>
 
 typedef struct {
     char *snapshot_path;
+    char *trace_control_path;
+    char *trace_path;
+    char *context_path;
     sr_subscription_ctx_t *hardware_subscription;
     sr_subscription_ctx_t *energy_subscription;
 } green_plugin_state_t;
+
+static char *read_snapshot(const char *path);
+
+static char *
+append_suffix(const char *path, const char *suffix)
+{
+    size_t path_length = strlen(path);
+    size_t suffix_length = strlen(suffix);
+    char *result = malloc(path_length + suffix_length + 1);
+
+    if (result) {
+        memcpy(result, path, path_length);
+        memcpy(result + path_length, suffix, suffix_length + 1);
+    }
+    return result;
+}
+
+static int
+trace_is_enabled(const green_plugin_state_t *state)
+{
+    FILE *control_file = fopen(state->trace_control_path, "r");
+    char value = '0';
+
+    if (!control_file) {
+        return 0;
+    }
+    (void)fread(&value, 1, 1, control_file);
+    fclose(control_file);
+    return value == '1';
+}
+
+static void
+trace_provider_reply(const green_plugin_state_t *state, const char *module_name,
+        const char *schema_path, const char *request_xpath, const char *status,
+        const struct lyd_node *data)
+{
+    FILE *trace_file;
+    char *json = NULL;
+    char *context = NULL;
+    time_t now;
+    struct tm utc_time;
+    char timestamp[32] = "unknown";
+
+    if (!trace_is_enabled(state)) {
+        return;
+    }
+    if (data && lyd_print_mem(&json, data, LYD_JSON, LYD_PRINT_WITHSIBLINGS) != LY_SUCCESS) {
+        json = NULL;
+    }
+    context = read_snapshot(state->context_path);
+    trace_file = fopen(state->trace_path, "a");
+    if (!trace_file) {
+        free(json);
+        free(context);
+        return;
+    }
+
+    now = time(NULL);
+    if (gmtime_r(&now, &utc_time)) {
+        (void)strftime(timestamp, sizeof timestamp, "%Y-%m-%dT%H:%M:%SZ", &utc_time);
+    }
+    fprintf(trace_file, "------------------------------------------------------------------------\n");
+    fprintf(trace_file, "%s", context ? context : "NETCONF GET (scenario context unavailable)\n");
+    fprintf(trace_file, "------------------------------------------------------------------------\n");
+    fprintf(trace_file, "[%s] NETCONF operational-data request\n", timestamp);
+    fprintf(trace_file, "operation: <get>\nmodule: %s\npath: %s\n",
+            module_name, schema_path);
+    fprintf(trace_file, "request-xpath: %s\nstatus: %s\nreply-data-json:\n%s\n\n",
+            request_xpath ? request_xpath : "(not provided)", status,
+            json ? json : "(empty)");
+    fclose(trace_file);
+    free(json);
+    free(context);
+}
 
 static char *
 read_snapshot(const char *path)
@@ -78,9 +156,13 @@ provide_operational_data(sr_session_ctx_t *session, uint32_t subscription_id,
     json = read_snapshot(state->snapshot_path);
     if (!json) {
         if (errno == ENOENT) {
+            trace_provider_reply(state, module_name, schema_path, request_xpath,
+                    "snapshot-not-yet-created", NULL);
             return SR_ERR_OK;
         }
         fprintf(stderr, "green-snapshot-plugin: cannot read %s\n", state->snapshot_path);
+        trace_provider_reply(state, module_name, schema_path, request_xpath,
+                "snapshot-read-error", NULL);
         return SR_ERR_SYS;
     }
 
@@ -90,6 +172,8 @@ provide_operational_data(sr_session_ctx_t *session, uint32_t subscription_id,
     free(json);
     if (ly_result != LY_SUCCESS) {
         fprintf(stderr, "green-snapshot-plugin: failed to parse operational snapshot\n");
+        trace_provider_reply(state, module_name, schema_path, request_xpath,
+            "snapshot-parse-error", NULL);
         return SR_ERR_VALIDATION_FAILED;
     }
 
@@ -106,6 +190,9 @@ provide_operational_data(sr_session_ctx_t *session, uint32_t subscription_id,
     } else if (ly_result == LY_ENOTFOUND) {
         ly_result = LY_SUCCESS;
     }
+
+    trace_provider_reply(state, module_name, schema_path, request_xpath,
+            ly_result == LY_SUCCESS ? "ok" : "provider-error", copy);
 
     lyd_free_all(data);
     if (ly_result != LY_SUCCESS) {
@@ -132,7 +219,15 @@ sr_plugin_init_cb(sr_session_ctx_t *session, void **private_data)
         return SR_ERR_NO_MEMORY;
     }
     state->snapshot_path = strdup(snapshot_path);
-    if (!state->snapshot_path) {
+    state->trace_control_path = append_suffix(snapshot_path, ".netconf-trace-enabled");
+    state->trace_path = append_suffix(snapshot_path, ".netconf-trace.log");
+    state->context_path = append_suffix(snapshot_path, ".netconf-context");
+    if (!state->snapshot_path || !state->trace_control_path || !state->trace_path ||
+            !state->context_path) {
+        free(state->snapshot_path);
+        free(state->trace_control_path);
+        free(state->trace_path);
+        free(state->context_path);
         free(state);
         return SR_ERR_NO_MEMORY;
     }
@@ -141,6 +236,9 @@ sr_plugin_init_cb(sr_session_ctx_t *session, void **private_data)
             provide_operational_data, state, 0, &state->hardware_subscription);
     if (result != SR_ERR_OK) {
         free(state->snapshot_path);
+        free(state->trace_control_path);
+        free(state->trace_path);
+        free(state->context_path);
         free(state);
         return result;
     }
@@ -151,6 +249,9 @@ sr_plugin_init_cb(sr_session_ctx_t *session, void **private_data)
     if (result != SR_ERR_OK) {
         sr_unsubscribe(state->hardware_subscription);
         free(state->snapshot_path);
+        free(state->trace_control_path);
+        free(state->trace_path);
+        free(state->context_path);
         free(state);
         return result;
     }
@@ -175,5 +276,8 @@ sr_plugin_cleanup_cb(sr_session_ctx_t *session, void *private_data)
         sr_unsubscribe(state->energy_subscription);
     }
     free(state->snapshot_path);
+    free(state->trace_control_path);
+    free(state->trace_path);
+    free(state->context_path);
     free(state);
 }

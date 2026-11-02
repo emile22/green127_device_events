@@ -1,10 +1,12 @@
 import argparse
 import time
 from collections.abc import Callable, Sequence
+from pathlib import Path
 
 from green.accounting import AccountingEngine
 from green.models import AccountingResult, EventSeries, SimulatedEvent
-from green.netconf_bridge import write_operational_snapshot
+from green.netconf_bridge import set_netconf_trace_enabled, write_operational_snapshot
+from green.netconf_trace import NetconfTraceTailer
 from green.simulator import EventSimulator
 from green.topology import RelationshipGraph, build_demo_topology
 
@@ -18,9 +20,26 @@ def run_demo(
     sleep_fn: Callable[[float], None],
     output_fn: Callable[[str], None],
     snapshot_fn: Callable[[SimulatedEvent], None] | None = None,
+    trace_fn: Callable[[bool], Path] | None = None,
 ) -> None:
     accounting = AccountingEngine()
+    set_trace = trace_fn or set_netconf_trace_enabled
+    trace_enabled = False
+    trace_tailer: NetconfTraceTailer | None = None
     output_fn("GREEN demo starting...")
+
+    def disable_trace() -> None:
+        nonlocal trace_enabled, trace_tailer
+        if not trace_enabled:
+            return
+        try:
+            set_trace(False)
+        except OSError as error:
+            output_fn(f"NETCONF trace could not be disabled: {error}")
+        trace_enabled = False
+        if trace_tailer is not None:
+            trace_tailer.stop()
+            trace_tailer = None
 
     while simulator.has_next:
         next_event = simulator.peek_next()
@@ -40,6 +59,7 @@ def run_demo(
             output_fn(
                 "[ENTER] next event\n"
                 "a       automatically run all remaining events\n"
+                "d       toggle NETCONF message trace\n"
                 "q       quit\n"
                 "r       restart scenario"
             )
@@ -48,7 +68,26 @@ def run_demo(
                 auto = True
                 output_fn("Automatic mode enabled.")
                 continue
+            if command == "d":
+                next_trace_state = not trace_enabled
+                try:
+                    trace_path = set_trace(next_trace_state)
+                except OSError as error:
+                    output_fn(f"NETCONF trace could not be updated: {error}")
+                    continue
+                trace_enabled = next_trace_state
+                if trace_enabled:
+                    trace_tailer = NetconfTraceTailer(trace_path, output_fn)
+                    trace_tailer.start()
+                    output_fn(f"NETCONF message trace enabled (live view): {trace_path}")
+                else:
+                    if trace_tailer is not None:
+                        trace_tailer.stop()
+                        trace_tailer = None
+                    output_fn(f"NETCONF message trace disabled: {trace_path}")
+                continue
             if command == "q":
+                disable_trace()
                 output_fn("GREEN demo stopped.")
                 return
             if command == "r":
@@ -97,6 +136,7 @@ def run_demo(
         if auto and simulator.has_next:
             sleep_fn(interval)
 
+    disable_trace()
     output_fn("GREEN demo completed.")
 
 
@@ -170,6 +210,7 @@ def main(
     sleep_fn: Callable[[float], None] = time.sleep,
     output_fn: Callable[[str], None] = print,
     snapshot_fn: Callable[[SimulatedEvent], None] | None = write_operational_snapshot,
+    trace_fn: Callable[[bool], Path] | None = None,
 ) -> None:
     parser = argparse.ArgumentParser(description="Run the GREEN energy demo")
     parser.add_argument("--auto", action="store_true", help="run all events without prompting")
@@ -179,6 +220,12 @@ def main(
     if args.interval < 0:
         parser.error("--interval must be non-negative")
 
+    set_trace = trace_fn or set_netconf_trace_enabled
+    try:
+        set_trace(False)
+    except OSError as error:
+        output_fn(f"NETCONF trace could not be reset: {error}")
+
     run_demo(
         EventSimulator(),
         auto=args.auto,
@@ -187,6 +234,7 @@ def main(
         sleep_fn=sleep_fn,
         output_fn=output_fn,
         snapshot_fn=snapshot_fn,
+        trace_fn=set_trace,
     )
 
 

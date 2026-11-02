@@ -52,6 +52,11 @@ def to_yang_instance(
     components: list[dict[str, object]] = []
     component_names: set[str] = set()
     component_uuids: set[str] = set()
+    all_component_names = {
+        item.hardware_component_name
+        for item in energy_objects
+        if item.hardware_component_name
+    }
     for energy_object in energy_objects:
         name = energy_object.hardware_component_name
         if not name:
@@ -65,6 +70,18 @@ def to_yang_instance(
             "name": name,
             "class": f"{IANA_HARDWARE_MODULE}:energy-object",
         }
+        if energy_object.hardware_parent_name:
+            if energy_object.hardware_parent_name not in all_component_names:
+                raise ValueError(
+                    f"hardware parent is not represented: {energy_object.hardware_parent_name}"
+                )
+            component["parent"] = energy_object.hardware_parent_name
+        if energy_object.hardware_parent_rel_pos is not None:
+            if not energy_object.hardware_parent_name:
+                raise ValueError("parent-rel-pos requires a hardware parent")
+            if energy_object.hardware_parent_rel_pos < 0:
+                raise ValueError("hardware parent-relative position cannot be negative")
+            component["parent-rel-pos"] = energy_object.hardware_parent_rel_pos
         hardware_uuid = energy_object.hardware_component_uuid
         if hardware_uuid:
             if hardware_uuid in component_uuids:
@@ -220,6 +237,12 @@ def from_yang_instance(
         hardware_uuid = component.get("uuid") if component is not None else None
         if hardware_uuid is not None and not isinstance(hardware_uuid, str):
             raise ValueError("hardware component uuid must be a string")
+        hardware_parent_name = component.get("parent") if component is not None else None
+        if hardware_parent_name is not None and not isinstance(hardware_parent_name, str):
+            raise ValueError("hardware component parent must be a string")
+        hardware_parent_rel_pos = component.get("parent-rel-pos") if component is not None else None
+        if hardware_parent_rel_pos is not None and not isinstance(hardware_parent_rel_pos, int):
+            raise ValueError("hardware component parent-rel-pos must be an integer")
 
         energy_objects.append(
             EnergyObject(
@@ -227,6 +250,8 @@ def from_yang_instance(
                 energy_object_id=energy_object_id,
                 hardware_component_name=component_name,
                 hardware_component_uuid=hardware_uuid,
+                hardware_parent_name=hardware_parent_name,
+                hardware_parent_rel_pos=hardware_parent_rel_pos,
             )
         )
 
