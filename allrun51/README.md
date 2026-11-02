@@ -115,17 +115,18 @@ using Energy Object IDs and `parent-rel-pos`.
 ## Runtime
 
 ```powershell
-python run.py
+py .\allrun51\run.py
 ```
 
-`run.py` checks WSL health and starts the allrun51 NETCONF stack if it is stopped
-or incomplete. It then runs pytest before the interactive simulator and stops
-the WSL services on every exit. To keep services running after a demo, start
-them with the WSL script and run `python -m green` directly.
+By default, `run.py` checks WSL health, starts the allrun51 NETCONF stack if it
+is stopped or incomplete, runs pytest, then prompts between Group A events. It
+stops the WSL services on every exit. To keep services running after a demo,
+start them with the WSL script and run `python -m green` directly.
 
 The launcher prefers `allrun51/.venv` when pytest, ncclient, and pyang are installed there. If that environment is incomplete, it uses the invoking interpreter and prepends `allrun51/src` to `PYTHONPATH`, so the allrun51 package is used rather than another installed GREEN package.
 
-For a noninteractive test-first run, use `python run.py --auto --interval 0`.
+To run all events automatically without delay, use `py .\allrun51\run.py --auto --interval 0`.
+Use `--interval SECONDS` to set another automatic-mode delay.
 
 Controls:
 

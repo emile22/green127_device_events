@@ -185,7 +185,10 @@ def test_launcher_stops_services_on_every_exit(
     assert steps[0] == "start" and steps[-1] == "stop"
     assert commands[-1][0] == "wsl.exe"
     assert "scripts/wsl-netconf-stop.sh" in commands[-1][-1]
-    assert commands.count(["project-python", "-m", "green"]) == int(test_returncode == 0)
+    runtime_commands = [command for command in commands if "green" in command]
+    assert len(runtime_commands) == int(test_returncode == 0)
+    if runtime_commands:
+        assert runtime_commands[0] == ["project-python", "-m", "green"]
 
 
 def test_launcher_does_not_run_pytest_if_wsl_startup_fails(monkeypatch) -> None:
@@ -202,7 +205,7 @@ def test_launcher_does_not_run_pytest_if_wsl_startup_fails(monkeypatch) -> None:
     assert stop_calls == ["stop"]
 
 
-def test_launcher_passes_optional_runtime_arguments(monkeypatch) -> None:
+def test_launcher_defaults_to_interactive_runtime(monkeypatch) -> None:
     commands: list[list[str]] = []
     working_directories: list[Path | None] = []
     runtime_pythonpaths: list[str] = []
@@ -219,14 +222,30 @@ def test_launcher_passes_optional_runtime_arguments(monkeypatch) -> None:
     monkeypatch.setattr(run.subprocess, "run", fake_run)
     monkeypatch.setattr(run, "pause_for_review", lambda *_args: None)
 
-    assert run.main(["--auto", "--interval", "0"]) == 0
+    assert run.main([]) == 0
     assert commands[0] == ["project-python", "-m", "pytest", "-v"]
-    assert commands[1] == [
-        "project-python", "-m", "green", "--auto", "--interval", "0.0"
-    ]
+    assert commands[1] == ["project-python", "-m", "green"]
     project_dir = Path(run.__file__).resolve().parent
     assert working_directories[:2] == [project_dir, project_dir]
     assert runtime_pythonpaths[0].split(run.os.pathsep)[0] == run.project_source
+
+
+def test_launcher_auto_mode_can_run_without_delay(monkeypatch) -> None:
+    commands: list[list[str]] = []
+
+    def fake_run(command: list[str], **_kwargs):
+        commands.append(command)
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(run, "project_python", lambda: "project-python")
+    monkeypatch.setattr(run, "ensure_netconf_services", lambda: True)
+    monkeypatch.setattr(run.subprocess, "run", fake_run)
+    monkeypatch.setattr(run, "pause_for_review", lambda *_args: None)
+
+    assert run.main(["--auto", "--interval", "0"]) == 0
+    assert commands[1] == [
+        "project-python", "-m", "green", "--auto", "--interval", "0.0"
+    ]
 
 
 def test_allrun51_netconf_ready_display_includes_process_pids_and_siblings(monkeypatch, capsys) -> None:
@@ -289,6 +308,7 @@ def test_windows_netconf_run_holds_and_releases_wsl_session(monkeypatch) -> None
                 "stdin": run.subprocess.PIPE,
                 "stdout": run.subprocess.DEVNULL,
                 "stderr": run.subprocess.DEVNULL,
+                "creationflags": getattr(run.subprocess, "CREATE_NO_WINDOW", 0),
             },
         )
     ]

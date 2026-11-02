@@ -71,6 +71,7 @@ def _start_wsl_keepalive() -> bool:
             stdin=subprocess.PIPE,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )
     except OSError as error:
         print(f"Could not keep WSL session alive: {error}")
@@ -248,8 +249,11 @@ def stop_netconf_services() -> None:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Test and run the GREEN allrun51 simulator")
-    parser.add_argument("--auto", action="store_true", help="run all events without prompting")
-    parser.add_argument("--interval", type=float, help="automatic-mode delay in seconds")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--auto", dest="auto", action="store_true", help="run all events automatically without prompts")
+    mode.add_argument("--interactive", dest="auto", action="store_false", help="prompt between events (default)")
+    parser.set_defaults(auto=False)
+    parser.add_argument("--interval", type=float, help="automatic-mode delay in seconds (default: 1)")
     args = parser.parse_args(argv)
     if args.interval is not None and args.interval < 0:
         parser.error("--interval must be non-negative")
