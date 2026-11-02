@@ -2,7 +2,7 @@
 
 ## Group A: Event-Ready
 
-`allrun5` implements these 14 use cases in numeric order:
+`allrun51` implements these 14 use cases in numeric order:
 
 1. UC 2.1 — Incremental Application of the GREEN Framework
 2. UC 2.2 — Selective reduction of energy consumption in network parts proportional to traffic levels

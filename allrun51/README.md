@@ -1,6 +1,6 @@
 # GREEN Canonical Network Simulator (`allrun51`)
 
-`allrun51/` is an isolated topology-driven continuation of the validated `allrun5/` simulator. `allrun5/` is a strictly read-only implementation reference; all allrun51 code, YANG, data, tests, scripts, generated snapshots, runtime files, and logs stay under this directory.
+`allrun51/` is an isolated topology-driven GREEN simulator. All source code, YANG, data, tests, scripts, generated snapshots, runtime files, and logs stay under this directory.
 
 The event meanings follow the upstream [draft-ietf-green-use-cases](https://github.com/emile22/draft-ietf-green-use-cases/blob/main/draft-ietf-green-use-cases.md). Event IDs and descriptions are simulator-specific and are not represented as standardized IETF events.
 
@@ -70,16 +70,16 @@ WSL Netopeer2 on TCP/830
 
 Windows runs the GREEN event simulator, adapter, CLI, and ncclient tests. Runtime snapshots and generated test credentials stay in `runtime/`; formatted/runtime and provider traces stay in `logs/`. Sysrepo stores the YANG modules and invokes the C operational-data provider. Netopeer2 serves NETCONF over SSH. WSL is used for native Sysrepo/Netopeer2 only; no containers are used. Windows tests prefer `localhost` and fall back to `NETCONF_HOST` from `runtime/netconf/connection.env` if WSL localhost forwarding is unavailable.
 
-The YANG revisions copied unchanged from the read-only `allrun5/yang/` reference are:
+The pinned YANG revisions included in this project are:
 
-| Module | Revision | Baseline source | allrun51 destination |
-| --- | --- | --- | --- |
-| `ietf-power-and-energy` | `2026-07-02` | `allrun5/yang/ietf-power-and-energy@2026-07-02.yang` | `yang/ietf-power-and-energy@2026-07-02.yang` |
-| `iana-power-and-energy` | `2026-07-02` | `allrun5/yang/iana-power-and-energy@2026-07-02.yang` | `yang/iana-power-and-energy@2026-07-02.yang` |
-| `ietf-hardware` | `2018-03-13` | `allrun5/yang/ietf-hardware@2018-03-13.yang` | `yang/ietf-hardware@2018-03-13.yang` |
-| `iana-hardware` | `2018-03-13` | `allrun5/yang/iana-hardware@2018-03-13.yang` | `yang/iana-hardware@2018-03-13.yang` |
-| `ietf-inet-types` | `2013-07-15` | `allrun5/yang/ietf-inet-types@2013-07-15.yang` | `yang/ietf-inet-types@2013-07-15.yang` |
-| `ietf-yang-types` | `2013-07-15` | `allrun5/yang/ietf-yang-types@2013-07-15.yang` | `yang/ietf-yang-types@2013-07-15.yang` |
+| Module | Revision | Included file |
+| --- | --- | --- |
+| `ietf-power-and-energy` | `2026-07-02` | `yang/ietf-power-and-energy@2026-07-02.yang` |
+| `iana-power-and-energy` | `2026-07-02` | `yang/iana-power-and-energy@2026-07-02.yang` |
+| `ietf-hardware` | `2018-03-13` | `yang/ietf-hardware@2018-03-13.yang` |
+| `iana-hardware` | `2018-03-13` | `yang/iana-hardware@2018-03-13.yang` |
+| `ietf-inet-types` | `2013-07-15` | `yang/ietf-inet-types@2013-07-15.yang` |
+| `ietf-yang-types` | `2013-07-15` | `yang/ietf-yang-types@2013-07-15.yang` |
 
 ## Setup
 
@@ -147,6 +147,25 @@ compact `HW`, `ENERGY`, `REL`, and `DIFF` lines. The `summary` command opens the
 detailed hardware inventory, Energy Objects, relationships, and UC interpretation.
 
 Every event has a deterministic explanation under 20 words. Runtime/controller metadata remains separate from YANG data. Missing measurements/capabilities remain unknown; interval and cumulative energy are distinct; cumulative counters reset only on `r`.
+
+## Adding Events
+
+To add an event to an existing Group A use case:
+
+1. Add an `_event(...)` entry, in sequence order, to that use case's `events` tuple in [catalog.py](src/green/catalog.py). Give it a unique ID such as `U5-8`, a concise event name, and a single deterministic explanation sentence under 20 words.
+2. Describe only the event's deltas: use existing Energy Object IDs for `energy`, `power`, and `states`; use `metadata` for simulator-only context; set `cumulative=True` only when the interval should advance that object's cumulative counter. Events must not create or rename inventory.
+3. For relationships, reference an existing `profiles` entry in `catalog.py`. If a genuinely new relationship profile is needed, define its directional relationships and explicit inverse in `_RELATIONSHIPS`, then add or update focused UC/relationship tests. Change `data/scenarios/uc-topology-matrix.json` only if the UC's topology assignment itself changes.
+4. Update the expected per-UC counts in [test_simulator.py](tests/test_simulator.py) and [test_catalog_docs.py](tests/test_catalog_docs.py). Add or extend a test under `tests/uc/` for the event's intended behavior. The catalog tests check unique IDs, sequence order, explanations, and generated documentation.
+5. Regenerate the event and project docs, then run the checks:
+
+       ```powershell
+       python -m green.catalog_docs
+       python scripts/generate_docs.py
+       python -m pytest -v
+       python -m green --auto --interval 0
+       ```
+
+The generated [event_catalog.md](docs/event_catalog.md) is documentation output; edit `catalog.py`, not that generated file. Adding a new use case is broader: it also requires a new `EventSeries`, a `UseCaseSpec`, a topology mapping, and use-case-specific tests and documentation.
 
 ## Relationship Semantics
 

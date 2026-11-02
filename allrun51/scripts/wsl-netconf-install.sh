@@ -3,6 +3,13 @@ set -euo pipefail
 
 project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 yang_dir="$project_dir/yang"
+multiarch_triplet="$(cc -print-multiarch)"
+if [[ -z "$multiarch_triplet" ]]; then
+  echo "Could not determine the system multiarch library directory." >&2
+  exit 1
+fi
+install -d -o root -g root -m 0755 \
+  "/usr/lib/$multiarch_triplet/sysrepo-plugind/plugins"
 
 install_module_if_missing() {
   local module_name="$1"

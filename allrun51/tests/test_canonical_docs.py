@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from green.canonical_docs import write_canonical_documents
+from green.markdown_tables import align_markdown_tables
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -60,3 +61,15 @@ def test_readme_contains_topology_short_labels_and_internals_flow() -> None:
         "NETCONF",
     )
     assert [readme.index(stage) for stage in stages] == sorted(readme.index(stage) for stage in stages)
+
+
+def test_generated_markdown_tables_are_column_aligned() -> None:
+    write_canonical_documents()
+    for path in (PROJECT_ROOT / "docs").rglob("*.md"):
+        document = path.read_text(encoding="utf-8")
+        assert align_markdown_tables(document) == document, path
+        table_rows = [
+            line for line in document.splitlines()
+            if line.startswith("|") and line.endswith("|")
+        ]
+        assert all(len(line) <= 160 for line in table_rows), path

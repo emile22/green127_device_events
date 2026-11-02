@@ -5,6 +5,7 @@ from pathlib import Path
 
 from green.capability_readiness import CAPABILITY_DEMO_SELECTIONS, readiness_rows, write_readiness_document
 from green.catalog import UC_CATALOG
+from green.markdown_tables import align_markdown_tables
 from green.models import RelationshipType
 from green.simulator import EventSimulator
 from green.topology import demo_energy_objects
@@ -36,6 +37,7 @@ def test_readiness_document_lists_stable_distinct_hardware_and_energy_ids() -> N
     assert "ietf-power-state-capabilities" in document
     assert "does not implement" in document
     assert "server-nic" in document and "isac-sensing-component" in document
+    assert align_markdown_tables(document) == document
 
 
 def test_selected_mappings_and_relationship_peers_are_stable_across_all_events_and_restart() -> None:

@@ -77,25 +77,37 @@ def render_event_catalog() -> str:
         "",
         "Event IDs and descriptions are simulator-specific and are not standardized IETF event names.",
         "",
-        "| UC | Title | Event ID | Event name | Description | Main state/data | Relationship families | YANG-visible data | Simulator-only metadata |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for use_case in UC_CATALOG:
+        lines.extend([
+            f"## {use_case.series.value} - {use_case.title}",
+            "",
+            "| UC | Event ID | Event name | Relationship families |",
+            "| --- | --- | --- | --- |",
+        ])
+        for spec in use_case.events:
+            event = events_by_id[spec.sequence]
+            row = (
+                use_case.series.value,
+                spec.sequence,
+                spec.name,
+                ", ".join(_event_families(event)),
+            )
+            lines.append("| " + " | ".join(_cell(value) for value in row) + " |")
+        lines.append("")
         for spec in use_case.events:
             event = events_by_id[spec.sequence]
             metadata = "; ".join(f"{key}={value}" for key, value in spec.metadata) or "none"
-            row = (
-                use_case.series.value,
-                use_case.title,
-                spec.sequence,
-                spec.name,
-                spec.explanation,
-                _main_state_data(spec, event),
-                ", ".join(_event_families(event)),
-                _yang_visible_data(spec, event),
-                metadata,
-            )
-            lines.append("| " + " | ".join(_cell(value) for value in row) + " |")
+            lines.extend([
+                f"### {spec.sequence} - {spec.name}",
+                "",
+                f"- Description: {spec.explanation}",
+                f"- Main state/data: {_main_state_data(spec, event)}",
+                f"- Relationship families: {', '.join(_event_families(event))}",
+                f"- YANG-visible data: {_yang_visible_data(spec, event)}",
+                f"- Simulator-only metadata: {metadata}",
+                "",
+            ])
     return "\n".join(lines) + "\n"
 
 
@@ -109,9 +121,10 @@ def render_relationship_coverage() -> str:
         "",
         "Relationships are stored directionally as YANG `identityref` values. Demonstration pairs include their explicit inverse; no inverse is synthesized by the views.",
         "",
-        "| Family | UC | Event IDs | Forward identity | Inverse identity | Energy Objects involved |",
-        "| --- | --- | --- | --- | --- | --- |",
+        "| Family | UC | Event IDs |",
+        "| --- | --- | --- |",
     ]
+    detail_rows = []
     for family, forward, inverse in _RELATIONSHIP_FAMILIES:
         for use_case in _REQUIRED_COVERAGE[family]:
             selected_events = []
@@ -131,16 +144,20 @@ def render_relationship_coverage() -> str:
                         object_ids.add(item.source_energy_object_id)
                         object_ids.add(item.peer_energy_object_id)
             lines.append(
-                "| {family} | {uc} | {events} | `{forward}` | `{inverse}` | {objects} |".format(
+                "| {family} | {uc} | {events} |".format(
                     family=family,
                     uc=use_case,
                     events=", ".join(item.sequence for item in selected_events),
-                    forward=forward.value,
-                    inverse=inverse.value,
-                    objects=", ".join(sorted(object_ids)) or "topology absent in initial event",
                 )
             )
+            detail_rows.append(
+                f"- {family}, {use_case}: forward `{forward.value}`, inverse `{inverse.value}`; Energy Objects: {', '.join(sorted(object_ids)) or 'topology absent in initial event'}."
+            )
     lines.extend([
+        "",
+        "## Energy Object Details",
+        "",
+        *detail_rows,
         "",
         "## Accounting Semantics",
         "",

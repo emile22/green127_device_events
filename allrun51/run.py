@@ -8,6 +8,8 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 from textwrap import wrap
 
+_wsl_keepalive: subprocess.Popen | None = None
+
 project_source = str(Path(__file__).resolve().parent / "src")
 if project_source not in sys.path:
     sys.path.insert(0, project_source)
@@ -52,6 +54,50 @@ def _wsl_project_path(project_dir: Path) -> str:
         drive = project_dir.drive[0].lower()
         return f"/mnt/{drive}{project_dir.as_posix()[2:]}"
     return str(project_dir)
+
+
+def _start_wsl_keepalive() -> bool:
+    global _wsl_keepalive
+    if os.name != "nt":
+        return True
+    if _wsl_keepalive is not None:
+        if _wsl_keepalive.poll() is None:
+            return True
+        _wsl_keepalive = None
+
+    try:
+        _wsl_keepalive = subprocess.Popen(
+            ["wsl.exe", "--exec", "/bin/cat"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except OSError as error:
+        print(f"Could not keep WSL session alive: {error}")
+        return False
+
+    if _wsl_keepalive.poll() is not None:
+        print("Could not keep WSL session alive: wsl.exe exited immediately.")
+        _wsl_keepalive = None
+        return False
+    return True
+
+
+def _stop_wsl_keepalive() -> None:
+    global _wsl_keepalive
+    process = _wsl_keepalive
+    _wsl_keepalive = None
+    if process is None:
+        return
+
+    try:
+        if process.stdin is not None:
+            process.stdin.close()
+        process.wait(timeout=5)
+    except (OSError, subprocess.TimeoutExpired):
+        if process.poll() is None:
+            process.terminate()
+            process.wait(timeout=5)
 
 
 def _hardware_component_ties() -> list[str]:
@@ -110,6 +156,8 @@ def _print_netconf_ready(project_dir: Path) -> None:
 
 
 def ensure_netconf_services() -> bool:
+    if not _start_wsl_keepalive():
+        return False
     project_dir = Path(__file__).resolve().parent
     wsl_project = _wsl_project_path(project_dir)
     expected_environment = (
@@ -182,17 +230,20 @@ def stop_netconf_services() -> None:
         result = subprocess.run(command, check=False, capture_output=True, text=True)
     except OSError as error:
         print(f"Warning: could not stop NETCONF services: {error}")
+        _stop_wsl_keepalive()
         return
 
     output = result.stdout.strip()
     if result.returncode == 0:
         if output:
             print(output)
+        _stop_wsl_keepalive()
         return
     detail = result.stderr.strip() or output
     print(f"Warning: could not stop NETCONF services (exit {result.returncode}).")
     if detail:
         print(detail)
+    _stop_wsl_keepalive()
 
 
 def main(argv: Sequence[str] | None = None) -> int:

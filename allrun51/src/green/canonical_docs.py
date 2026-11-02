@@ -10,6 +10,7 @@ from green.canonical_network import (
 )
 from green.catalog import UC_CATALOG
 from green.energy_observability import write_observability_document
+from green.markdown_tables import align_markdown_directory, align_markdown_tables
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -31,20 +32,37 @@ def render_canonical_network() -> str:
         "",
         f"`{network.network_id}` is one stable logical network composed of {len(network.topologies)} reusable sub-topologies.",
         "",
-        "| Topology | Name | Device instances | Energy Objects | Relationship profiles |",
-        "| --- | --- | --- | ---: | --- |",
+        "| Topology | Name | Devices | Energy Objects |",
+        "| --- | --- | ---: | ---: |",
     ]
     for topology in network.topologies:
-        names = ", ".join(device_names[item] for item in topology.device_ids)
         lines.append(
-            f"| {topology_labels[topology.topology_id]} ({topology.topology_id}) | {topology.name} | {names} | {len(topology.energy_object_ids)} | {', '.join(topology.relationship_profiles)} |"
+            f"| {topology_labels[topology.topology_id]} | {topology.name} | {len(topology.device_ids)} | {len(topology.energy_object_ids)} |"
         )
     lines.extend([
         "",
         "Sub-topologies may share a stable device instance; the UC mapping selects a primary view and optional supporting views without cloning the device inventory.",
         "RFC 8348 containment and GREEN Energy Object relationships are modeled separately. The topology registry supplies stable identities; event definitions supply only dynamic overlays.",
         "",
+        "## Topology Details",
+        "",
     ])
+    for topology in network.topologies:
+        lines.extend([
+            f"### {topology_labels[topology.topology_id]} - {topology.name}",
+            "",
+            f"Topology ID: `{topology.topology_id}`.",
+            "",
+            "Device instances:",
+        ])
+        lines.extend(
+            f"- `{device_id}` - {device_names[device_id]}"
+            for device_id in topology.device_ids
+        )
+        lines.extend([
+            f"Relationship profiles: {', '.join(topology.relationship_profiles)}.",
+            "",
+        ])
     return "\n".join(lines)
 
 
@@ -60,14 +78,28 @@ def render_device_archetypes() -> str:
         "",
         "Archetypes define reusable device classes; instances provide stable `device_id` values. Hardware Components and Energy Objects remain separate identities below those instances.",
         "",
-        "| Archetype | Name | Component roles | Device instances |",
-        "| --- | --- | --- | --- |",
+        "| Archetype | Name | Role count | Instance count |",
+        "| --- | --- | ---: | ---: |",
     ]
     for archetype in network.archetypes:
         lines.append(
-            f"| {archetype.archetype_id} | {archetype.name} | {', '.join(archetype.component_roles)} | {', '.join(sorted(devices_by_archetype[archetype.archetype_id]))} |"
+            f"| {archetype.archetype_id} | {archetype.name} | {len(archetype.component_roles)} | {len(devices_by_archetype[archetype.archetype_id])} |"
         )
-    lines.extend(["", "UC scenarios never redefine or rename a device instance.", ""])
+    lines.extend(["", "## Archetype Details", ""])
+    for archetype in network.archetypes:
+        lines.extend([
+            f"### {archetype.archetype_id} - {archetype.name}",
+            "",
+            f"Component roles: {', '.join(archetype.component_roles)}.",
+            "",
+            "Device instances:",
+        ])
+        lines.extend(
+            f"- `{device_id}`"
+            for device_id in sorted(devices_by_archetype[archetype.archetype_id])
+        )
+        lines.append("")
+    lines.extend(["UC scenarios never redefine or rename a device instance.", ""])
     return "\n".join(lines)
 
 
@@ -78,14 +110,37 @@ def render_uc_topology_matrix() -> str:
     lines = [
         "# UC-to-Topology Matrix",
         "",
-        "| UC | Primary topology | Secondary topology | Events |",
-        "| --- | --- | --- | ---: |",
+        "## Use Case Names",
+        "",
+        "| UC | Name |",
+        "| --- | --- |",
     ]
     for uc in sorted(scenarios, key=_uc_order):
         scenario = scenarios[uc]
         use_case = use_cases[uc]
+        lines.append(f"| {uc} | {use_case.title} |")
+    lines.extend([
+        "",
+        "## Topology Assignment Summary",
+        "",
+        "| UC | Primary | Secondary | Events |",
+        "| --- | --- | --- | ---: |",
+    ])
+    topology_labels = {
+        "T1-fixed-network": "T1 CORE",
+        "T2-wlan-poe": "T2 AIR",
+        "T3-power-infrastructure": "T3 POWER",
+        "T4-wireless-transport": "T4 BACKHAUL",
+        "T5-edge-compute": "T5 EDGE",
+        "T6-isac-smart-city": "T6 CITY",
+    }
+    for uc in sorted(scenarios, key=_uc_order):
+        scenario = scenarios[uc]
+        use_case = use_cases[uc]
+        primary = "All (T1-T6)" if uc == "UC 2.11" else ", ".join(topology_labels[item] for item in scenario.primary)
+        secondary = ", ".join(topology_labels[item] for item in scenario.secondary) or "-"
         lines.append(
-            f"| {uc} {use_case.title} | {', '.join(scenario.primary)} | {', '.join(scenario.secondary) or '-'} | {len(use_case.events)} |"
+            f"| {uc} | {primary} | {secondary} | {len(use_case.events)} |"
         )
     lines.extend(["", "UC 2.11 uses the full canonical network. Group B UCs 2.3 and 2.4 remain deferred.", ""])
     return "\n".join(lines)
@@ -127,14 +182,18 @@ def render_relationship_behavior_classes() -> str:
     lines = [
         "# Relationship Behavior Classes",
         "",
-        "| Behavior class | Relationship types | Directed links | Semantics |",
-        "| --- | --- | ---: | --- |",
+        "| Behavior class | Links | Relationship types |",
+        "| --- | ---: | --- |",
     ]
     for behavior_class in (STABLE_STRUCTURAL, PHYSICAL_DYNAMIC, KNOWLEDGE_OBSERVABILITY):
         lines.append(
-            f"| {behavior_class} | {', '.join(sorted(types_by_class.get(behavior_class, set())))} | {counts.get(behavior_class, 0)} | {descriptions[behavior_class]} |"
+            f"| {behavior_class} | {counts.get(behavior_class, 0)} | {', '.join(sorted(types_by_class.get(behavior_class, set())))} |"
         )
     lines.extend([
+        "",
+        "## Class Semantics",
+        "",
+        *[f"- `{name}`: {description}" for name, description in descriptions.items()],
         "",
         "Hardware `parent` containment does not imply metering, aggregation, powering, or enabling.",
         "",
@@ -186,6 +245,7 @@ def write_canonical_documents(project_root: Path | None = None) -> tuple[Path, .
         path.write_text(renderer(), encoding="utf-8")
         paths.append(path)
     paths.append(write_observability_document(docs / "energy_object_observability.md"))
+    align_markdown_directory(docs)
     return tuple(paths)
 
 

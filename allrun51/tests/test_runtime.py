@@ -241,6 +241,7 @@ def test_allrun51_netconf_ready_display_includes_process_pids_and_siblings(monke
         return SimpleNamespace(returncode=0, stdout="101\n202\n", stderr="")
 
     monkeypatch.setattr(run.subprocess, "run", fake_run)
+    monkeypatch.setattr(run, "_start_wsl_keepalive", lambda: True)
 
     assert run.ensure_netconf_services()
     output = capsys.readouterr().out
@@ -251,3 +252,47 @@ def test_allrun51_netconf_ready_display_includes_process_pids_and_siblings(monke
     assert "eo-router-a-linecard-2/linecard-2" in output
     assert "[siblings]" in output
     assert any("sysrepo-plugind.service" in command[-1] for command in commands)
+
+
+def test_windows_netconf_run_holds_and_releases_wsl_session(monkeypatch) -> None:
+    calls: list[tuple[list[str], dict[str, object]]] = []
+    lifecycle: list[str] = []
+
+    class FakeStdin:
+        def close(self) -> None:
+            lifecycle.append("stdin-closed")
+
+    class FakeProcess:
+        stdin = FakeStdin()
+
+        def poll(self) -> None:
+            return None
+
+        def wait(self, timeout: float) -> None:
+            lifecycle.append(f"waited-{timeout}")
+
+    process = FakeProcess()
+
+    def fake_popen(command: list[str], **kwargs: object) -> FakeProcess:
+        calls.append((command, kwargs))
+        return process
+
+    monkeypatch.setattr(run, "os", SimpleNamespace(name="nt"))
+    monkeypatch.setattr(run, "_wsl_keepalive", None)
+    monkeypatch.setattr(run.subprocess, "Popen", fake_popen)
+
+    assert run._start_wsl_keepalive()
+    assert calls == [
+        (
+            ["wsl.exe", "--exec", "/bin/cat"],
+            {
+                "stdin": run.subprocess.PIPE,
+                "stdout": run.subprocess.DEVNULL,
+                "stderr": run.subprocess.DEVNULL,
+            },
+        )
+    ]
+
+    run._stop_wsl_keepalive()
+    assert lifecycle == ["stdin-closed", "waited-5"]
+    assert run._wsl_keepalive is None

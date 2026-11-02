@@ -118,14 +118,29 @@ def render_observability_document(
         "",
         "Classes describe evidence in the deterministic event catalog, not new YANG leaves. Display-only `UNKNOWN` means applicable but absent from the current observation; `N/A` means the observability profile intentionally does not apply the field. Numeric zero remains the measured value `0`.",
         "",
-        "| Device ID | Energy Object ID | Hardware component | Class | Power evidence | State evidence | Energy evidence | Relationship evidence |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- |",
+        "| Energy Object | Class | Power | State | Energy | Relationships |",
+        "| --- | --- | --- | --- | --- | --- |",
     ]
     for item in objects:
         record = registry[item.energy_object_id]
         lines.append(
-            f"| `{record.device_id}` | `{record.energy_object_id}` | `{record.hardware_component_name}` | `{record.observability_class.value}` | {'observed' if record.power_observed else 'not observed'} | {'observed' if record.state_observed else 'not observed'} | {'observed' if record.energy_observed else 'not observed'} | {'defined' if record.relationships_defined else 'not defined'} |"
+            f"| `{record.energy_object_id}` | `{record.observability_class.value}` | {'yes' if record.power_observed else 'no'} | {'yes' if record.state_observed else 'no'} | {'yes' if record.energy_observed else 'no'} | {'yes' if record.relationships_defined else 'no'} |"
         )
+    lines.extend(["", "## Object Details", ""])
+    for item in objects:
+        record = registry[item.energy_object_id]
+        lines.extend([
+            f"### {record.energy_object_id}",
+            "",
+            f"- Device ID: `{record.device_id}`",
+            f"- Hardware component: `{record.hardware_component_name}`",
+            f"- Class: `{record.observability_class.value}`",
+            f"- Power evidence: {'observed' if record.power_observed else 'not observed'}",
+            f"- State evidence: {'observed' if record.state_observed else 'not observed'}",
+            f"- Energy evidence: {'observed' if record.energy_observed else 'not observed'}",
+            f"- Relationship evidence: {'defined' if record.relationships_defined else 'not defined'}",
+            "",
+        ])
     counts = {classification: 0 for classification in ObservabilityClass}
     for record in registry.values():
         counts[record.observability_class] += 1

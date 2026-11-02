@@ -2,6 +2,7 @@ from collections import Counter
 import re
 
 from green.catalog_docs import render_event_catalog, render_relationship_coverage
+from green.catalog import EVENT_CATALOG
 
 
 EXPECTED_EVENT_COUNTS = {
@@ -19,14 +20,17 @@ def test_generated_event_catalog_has_122_unique_described_events() -> None:
     counts: Counter[str] = Counter()
     for row in rows:
         cells = [cell.strip() for cell in row.split("|")[1:-1]]
-        ids.append(cells[2])
+        ids.append(cells[1])
         counts[cells[0]] += 1
-        assert cells[4]
-        assert len(cells[4].split()) < 20
+        assert cells[2]
     assert len(rows) == 122
     assert len(set(ids)) == 122
     assert counts == EXPECTED_EVENT_COUNTS
     assert "14 use cases, 122 deterministic events" in document
+    for event in EVENT_CATALOG:
+        assert event.sequence in ids
+        assert event.explanation in document
+        assert len(event.explanation.split()) < 20
 
 
 def test_relationship_coverage_doc_lists_four_events_for_each_required_uc() -> None:

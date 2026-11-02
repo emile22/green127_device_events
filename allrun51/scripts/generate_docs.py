@@ -149,16 +149,12 @@ def generate_relationship_coverage() -> str:
 
 
 def main() -> None:
-    docs_dir = PROJECT_ROOT / "docs"
-    docs_dir.mkdir(parents=True, exist_ok=True)
-    (docs_dir / "event_catalog.md").write_text(generate_event_catalog(), encoding="utf-8")
-    (docs_dir / "relationship_coverage.md").write_text(generate_relationship_coverage(), encoding="utf-8")
-    from green.capability_readiness import write_readiness_document
+    from green.catalog_docs import write_catalog_documents
     from green.canonical_docs import write_canonical_documents
 
-    write_readiness_document()
-    write_canonical_documents(PROJECT_ROOT)
-    print(f"Generated event and relationship docs under {docs_dir}")
+    paths = (*write_catalog_documents(PROJECT_ROOT), *write_canonical_documents(PROJECT_ROOT))
+    for path in paths:
+        print(path.relative_to(PROJECT_ROOT))
 
 
 if __name__ == "__main__":

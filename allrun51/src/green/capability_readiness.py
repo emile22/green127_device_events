@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from green.canonical_network import load_canonical_network
+from green.markdown_tables import align_markdown_tables
 from green.topology import demo_energy_objects
 
 
@@ -51,6 +52,15 @@ CAPABILITY_DEMO_SELECTIONS = (
     ),
 )
 
+TOPOLOGY_LABELS = {
+    "T1-fixed-network": "T1 CORE",
+    "T2-wlan-poe": "T2 AIR",
+    "T3-power-infrastructure": "T3 POWER",
+    "T4-wireless-transport": "T4 BACKHAUL",
+    "T5-edge-compute": "T5 EDGE",
+    "T6-isac-smart-city": "T6 CITY",
+}
+
 
 def readiness_rows() -> list[dict[str, str]]:
     network = load_canonical_network()
@@ -70,6 +80,7 @@ def readiness_rows() -> list[dict[str, str]]:
             if topology.topology_id in selected_topology_ids
             and energy_object.device_id in topology.device_ids
         ]
+        topology_summary = [TOPOLOGY_LABELS[topology_id] for topology_id in topology_ids]
         relationships = []
         for item in network.relationship_behaviors:
             relationship = item.relationship
@@ -91,6 +102,7 @@ def readiness_rows() -> list[dict[str, str]]:
                 "device_id": energy_object.device_id,
                 "device_archetype": device.archetype_id,
                 "topology": ", ".join(topology_ids),
+                "topology_summary": ", ".join(topology_summary),
                 "energy_object_id": energy_object.energy_object_id,
                 "source_component_id": energy_object.hardware_component_name or "",
                 "relevant_relationships": "; ".join(sorted(relationships)) or "none currently modeled",
@@ -110,25 +122,46 @@ def render_readiness_document() -> str:
         "",
         "The selected Energy Objects map to RFC 8348 Components by the existing `source-component-id` leafref. Device ID, component name, UUID, and Energy Object ID remain distinct.",
         "",
-        "| Device ID | Hardware component | UUID | Device archetype | Topology | Energy Object ID | source-component-id | Relevant relationships | UCs | Future capability-profile class | Reason |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+        "| Hardware component | Profile class | UCs | Topology |",
+        "| --- | --- | --- | --- |",
     ]
     for row in rows:
         lines.append(
-            "| `{device}` | `{name}` | `{uuid}` | `{archetype}` | {topology} | `{eo}` | `{source}` | {relationships} | {ucs} | `{profile}` | {reason} |".format(
-                device=row["device_id"],
+            "| `{name}` | `{profile}` | {ucs} | {topology} |".format(
                 name=row["hardware_component_name"],
-                uuid=row["hardware_component_uuid"],
-                archetype=row["device_archetype"],
-                topology=row["topology"],
-                eo=row["energy_object_id"],
-                source=row["source_component_id"],
-                relationships=row["relevant_relationships"].replace("|", "\\|"),
+                topology=row["topology_summary"],
                 ucs=row["uc"],
                 profile=row["future_capability_profile_class"],
-                reason=row["reason"],
             )
         )
+    lines.extend(["", "## Component Details", ""])
+    for row in rows:
+        lines.extend([
+            f"### {row['energy_object_id']} ({row['hardware_component_name']})",
+            "",
+            f"- Device ID: `{row['device_id']}`",
+            f"- Hardware component name: `{row['hardware_component_name']}`",
+            f"- Hardware component UUID: `{row['hardware_component_uuid']}`",
+            f"- Device archetype: `{row['device_archetype']}`",
+            f"- Topology: {row['topology']}",
+            f"- Energy Object ID: `{row['energy_object_id']}`",
+            f"- source-component-id: `{row['source_component_id']}`",
+            f"- UCs: {row['uc']}",
+            f"- Future capability-profile class: `{row['future_capability_profile_class']}`",
+            f"- Reason: {row['reason']}",
+            "- Relevant GREEN relationships:",
+        ])
+        relationships = [
+            item.strip()
+            for item in row["relevant_relationships"].split(";")
+            if item.strip()
+        ]
+        lines.extend(
+            [f"  - {relationship}" for relationship in relationships]
+            if relationships
+            else ["  - none currently modeled"]
+        )
+        lines.append("")
     lines.extend(
         [
             "",
@@ -142,5 +175,5 @@ def render_readiness_document() -> str:
 def write_readiness_document(destination: Path | None = None) -> Path:
     target = destination or Path(__file__).resolve().parents[2] / "docs" / "capability_discovery_readiness.md"
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(render_readiness_document(), encoding="utf-8")
+    target.write_text(align_markdown_tables(render_readiness_document()), encoding="utf-8")
     return target
