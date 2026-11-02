@@ -1,9 +1,13 @@
 import json
 
-from green.simulator import generate_events
+from green.netconf_trace import _energy_object_inventory, format_netconf_trace_entry
+from green.models import EventSeries
+from green.netconf_trace import format_netconf_trace_entry
+from green.simulator import EventSimulator, generate_events
 from green.topology import demo_energy_objects
 from green.views import (
     event_to_yang,
+    filter_yang_instance_to_energy_objects,
     render_compact_event,
     render_json,
     render_relationship_diff,
@@ -75,3 +79,82 @@ def test_compact_event_view_has_short_directional_sections():
     compact_hardware = render_compact_event(final, demo_energy_objects(), events["U16-8"]).splitlines()[2]
     assert "transport-module=active" in compact_hardware
     assert "ap-1=" not in compact_hardware
+
+
+def test_energy_object_inventory_stays_readable_in_narrow_terminal():
+    event = events_by_sequence()["U6-0"]
+    rows = _energy_object_inventory(event_to_yang(event, demo_energy_objects()), terminal_width=56)
+
+    assert rows is not None
+    assert all(len(row) <= 56 for row in rows)
+    rendered = "\n".join(rows)
+    assert "Relationships: " in rendered
+    assert "AGGREGATING(2)" in rendered
+
+
+def test_selected_uc_summary_and_compact_view_only_show_its_topology():
+    simulator = EventSimulator(use_case=EventSeries.UC_2_1)
+    scenario = simulator.network.scenarios_by_uc[EventSeries.UC_2_1.value]
+    topology_ids = set(scenario.topology_ids)
+    visible_ids = frozenset(
+        energy_object_id
+        for topology in simulator.network.topologies
+        if topology.topology_id in topology_ids
+        for energy_object_id in topology.energy_object_ids
+    )
+    event = simulator.next_event()
+    assert event is not None
+    data = filter_yang_instance_to_energy_objects(
+        event_to_yang(event, simulator.energy_objects), visible_ids
+    )
+
+    summary = render_summary(event, data, visible_energy_object_ids=visible_ids)
+    compact = render_compact_event(
+        event,
+        simulator.energy_objects,
+        None,
+        visible_energy_object_ids=visible_ids,
+    )
+    assert "eo-router-a" in summary
+    assert "eo-ap-1" not in summary
+    assert "eo-ap-1" not in compact
+
+
+def test_selected_uc_netconf_trace_filters_objects_and_relationship_peers():
+    data = {
+        "ietf-hardware:hardware": {
+            "component": [
+                {"name": "router-A", "class": "iana-hardware:chassis"},
+                {"name": "linecard-1", "parent": "router-A", "class": "iana-hardware:module"},
+                {"name": "ap-1", "class": "iana-hardware:chassis"},
+            ]
+        },
+        "ietf-power-and-energy:energy-objects": {
+            "energy-object": [
+                {
+                    "id": "eo-router-a",
+                    "source-component-id": "router-A",
+                    "relationship": [{
+                        "type": "ietf-power-and-energy:enabling",
+                        "peer": [{"id": "eo-router-a-linecard-1"}, {"id": "eo-ap-1"}],
+                    }],
+                },
+                {"id": "eo-router-a-linecard-1", "source-component-id": "linecard-1"},
+                {"id": "eo-ap-1", "source-component-id": "ap-1"},
+            ]
+        },
+    }
+    entry = (
+        "[2026-11-02T00:00:00Z] NETCONF operational-data request\n"
+        "operation: <get>\nmodule: ietf-power-and-energy\n"
+        "path: /ietf-power-and-energy:energy-objects\nrequest-xpath: /*\n"
+        "status: ok\nreply-data-json:\n"
+        + json.dumps(data)
+    )
+
+    formatted = format_netconf_trace_entry(entry, {"eo-router-a", "eo-router-a-linecard-1"})
+
+    assert "eo-router-a" in formatted
+    assert "linecard-1" in formatted
+    assert "eo-ap-1" not in formatted
+    assert "ap-1" not in formatted

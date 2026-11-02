@@ -128,6 +128,13 @@ The launcher prefers `allrun51/.venv` when pytest, ncclient, and pyang are insta
 To run all events automatically without delay, use `py .\allrun51\run.py --auto --interval 0`.
 Use `--interval SECONDS` to set another automatic-mode delay.
 
+To run only one implemented Group A use case, pass its number with `-u` or
+`--uc`, for example `py .\allrun51\run.py -u 2.13`. The same option works with
+`python -m green -u 2.13`. Supported selections are UC 2.1, 2.2, and 2.5–2.16;
+UC 2.3 and 2.4 remain deferred. A selected-UC run skips the full pytest suite
+to avoid rerunning it after a successful test-first run; run `python -m pytest -v`
+separately after changing code.
+
 Controls:
 
 | Input | Behavior |

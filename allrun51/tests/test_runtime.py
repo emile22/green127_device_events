@@ -248,6 +248,35 @@ def test_launcher_auto_mode_can_run_without_delay(monkeypatch) -> None:
     ]
 
 
+def test_launcher_passes_selected_uc_to_runtime(monkeypatch, capsys) -> None:
+    commands: list[list[str]] = []
+
+    def fake_run(command: list[str], **_kwargs):
+        commands.append(command)
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(run, "project_python", lambda: "project-python")
+    monkeypatch.setattr(run, "ensure_netconf_services", lambda: True)
+    monkeypatch.setattr(run.subprocess, "run", fake_run)
+    monkeypatch.setattr(run, "pause_for_review", lambda *_args: None)
+
+    assert run.main(["-u", "2.13", "--auto", "--interval", "0"]) == 0
+    stop_command = run._wsl_command(
+        Path(run.__file__).resolve().parent,
+        "bash scripts/wsl-netconf-stop.sh",
+    )
+    assert commands == [
+        [
+            "project-python", "-m", "green", "--auto", "--interval", "0.0",
+            "--uc", "2.13",
+        ],
+        stop_command,
+    ]
+    output = capsys.readouterr().out
+    assert "Skipping full pytest suite for selected UC 2.13" in output
+    assert "All tests passed" not in output
+
+
 def test_allrun51_netconf_ready_display_includes_process_pids_and_siblings(monkeypatch, capsys) -> None:
     commands: list[list[str]] = []
 

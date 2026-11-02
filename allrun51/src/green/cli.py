@@ -18,9 +18,30 @@ from green.views import (
     render_relationship_diff,
     render_relationships,
     render_summary,
+    filter_yang_instance_to_energy_objects,
 )
 
 _VIEW_COMMANDS = {"summary", "relationships", "json", "xml", "diff"}
+SUPPORTED_USE_CASE_IDS = tuple(
+    sorted(
+        {series.value.removeprefix("UC ") for series in EventSeries},
+        key=lambda value: tuple(int(part) for part in value.split(".")),
+    )
+)
+
+
+def parse_use_case(value: str) -> EventSeries:
+    normalized = value.strip().upper()
+    if normalized.startswith("UC"):
+        normalized = normalized[2:].strip()
+    normalized = normalized.replace(" ", "")
+    for series in EventSeries:
+        if series.value.removeprefix("UC ").replace(" ", "") == normalized:
+            return series
+    available = ", ".join(SUPPORTED_USE_CASE_IDS)
+    raise argparse.ArgumentTypeError(
+        f"unknown UC {value!r}; choose one of: {available}"
+    )
 
 
 def run_demo(
@@ -43,6 +64,16 @@ def run_demo(
     current_event: SimulatedEvent | None = None
     previous_event: SimulatedEvent | None = None
     current_data: dict[str, object] | None = None
+    visible_energy_object_ids: frozenset[str] | None = None
+    if simulator.use_case is not None:
+        scenario = simulator.network.scenarios_by_uc[simulator.use_case.value]
+        selected_topologies = set(scenario.topology_ids)
+        visible_energy_object_ids = frozenset(
+            energy_object_id
+            for topology in simulator.network.topologies
+            if topology.topology_id in selected_topologies
+            for energy_object_id in topology.energy_object_ids
+        )
     output_fn("GREEN allrun51 demo starting...")
 
     def disable_trace() -> None:
@@ -71,13 +102,21 @@ def run_demo(
             output_fn(f"{command} view unavailable before the first event.")
             return
         if command == "summary":
-            output_fn(render_summary(current_event, current_data))
+            output_fn(render_summary(
+                current_event,
+                current_data,
+                visible_energy_object_ids=visible_energy_object_ids,
+            ))
         elif command == "relationships":
             output_fn(render_relationships(current_data))
         elif command == "json":
             output_fn(render_json(current_data))
         elif command == "diff":
-            output_fn(render_relationship_diff(previous_event, current_event))
+            output_fn(render_relationship_diff(
+                previous_event,
+                current_event,
+                visible_energy_object_ids=visible_energy_object_ids,
+            ))
 
     while simulator.has_next:
         next_spec = simulator.peek_next()
@@ -104,7 +143,11 @@ def run_demo(
                     continue
                 trace_enabled = next_trace_state
                 if trace_enabled:
-                    trace_tailer = NetconfTraceTailer(trace_path, output_fn)
+                    trace_tailer = NetconfTraceTailer(
+                        trace_path,
+                        output_fn,
+                        visible_energy_object_ids=visible_energy_object_ids,
+                    )
                     trace_tailer.start()
                     output_fn(f"NETCONF trace enabled (live view): {trace_path}")
                 else:
@@ -152,10 +195,19 @@ def run_demo(
                 event_name=event.name,
             )
         data = event_to_yang(event, simulator.energy_objects)
+        if visible_energy_object_ids is not None:
+            data = filter_yang_instance_to_energy_objects(data, visible_energy_object_ids)
         prior_event = current_event
         previous_event, current_event = current_event, event
         current_data = data
-        _display_event(event, result, topology, output_fn, prior_event)
+        _display_event(
+            event,
+            result,
+            topology,
+            output_fn,
+            prior_event,
+            visible_energy_object_ids,
+        )
 
         next_spec = simulator.peek_next()
         if next_spec is None:
@@ -167,8 +219,11 @@ def run_demo(
             sleep_fn(interval)
 
     disable_trace()
-    output_fn("Group A completed: 14 use cases")
-    output_fn("Group B deferred: 2 use cases")
+    if simulator.use_case is None:
+        output_fn("Group A completed: 14 use cases")
+        output_fn("Group B deferred: 2 use cases")
+    else:
+        output_fn(f"{simulator.use_case.value} completed")
 
 
 def _display_event(
@@ -177,8 +232,15 @@ def _display_event(
     topology: RelationshipGraph,
     output_fn: Callable[[str], None],
     previous: SimulatedEvent | None,
+    visible_energy_object_ids: frozenset[str] | None = None,
 ) -> None:
-    for line in render_compact_event(event, topology.energy_objects, previous, result).splitlines():
+    for line in render_compact_event(
+        event,
+        topology.energy_objects,
+        previous,
+        result,
+        visible_energy_object_ids,
+    ).splitlines():
         output_fn(line)
 
 
@@ -195,6 +257,13 @@ def main(
     parser = argparse.ArgumentParser(description="Run the GREEN allrun51 event simulator")
     parser.add_argument("--auto", action="store_true", help="run all remaining events without prompts")
     parser.add_argument("--interval", type=float, default=1.0)
+    parser.add_argument(
+        "-u",
+        "--uc",
+        type=parse_use_case,
+        metavar="UC",
+        help=f"run only one implemented UC (available: {', '.join(SUPPORTED_USE_CASE_IDS)})",
+    )
     args = parser.parse_args(argv)
     if args.interval < 0:
         parser.error("--interval must be non-negative")
@@ -205,7 +274,7 @@ def main(
     except OSError as error:
         output_fn(f"NETCONF trace could not be reset: {error}")
     run_demo(
-        EventSimulator(),
+        EventSimulator(use_case=args.uc),
         auto=args.auto,
         interval=args.interval,
         input_fn=input_fn,

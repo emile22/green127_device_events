@@ -5,6 +5,7 @@ from green.canonical_network import CanonicalNetwork, load_canonical_network
 from green.models import (
     ComponentState,
     EnergyObject,
+    EventSeries,
     MetricType,
     RawEnergyMeasurement,
     RawPowerMeasurement,
@@ -19,18 +20,25 @@ class EventSimulator:
         energy_objects: tuple[EnergyObject, ...] | None = None,
         *,
         network: CanonicalNetwork | None = None,
+        use_case: EventSeries | None = None,
     ) -> None:
         self.network = network or load_canonical_network()
         self.energy_objects = energy_objects or self.network.energy_objects
+        self.use_case = use_case
+        self._event_specs = tuple(
+            (index, spec)
+            for index, spec in enumerate(EVENT_CATALOG)
+            if use_case is None or spec.series is use_case
+        )
         self._objects_by_id = {item.energy_object_id: item for item in self.energy_objects}
         self.reset()
 
     @property
     def has_next(self) -> bool:
-        return self._index < len(EVENT_CATALOG)
+        return self._index < len(self._event_specs)
 
     def peek_next(self) -> EventSpec | None:
-        return EVENT_CATALOG[self._index] if self.has_next else None
+        return self._event_specs[self._index][1] if self.has_next else None
 
     def reset(self) -> None:
         self._index = 0
@@ -44,8 +52,7 @@ class EventSimulator:
         if not self.has_next:
             return None
 
-        event_index = self._index
-        definition = EVENT_CATALOG[event_index]
+        event_index, definition = self._event_specs[self._index]
         sequence = definition.sequence
         if self._active_series is not definition.series:
             self._component_states = {}
@@ -124,8 +131,8 @@ class EventSimulator:
             ) from error
 
 
-def generate_events() -> tuple[SimulatedEvent, ...]:
-    simulator = EventSimulator()
+def generate_events(use_case: EventSeries | None = None) -> tuple[SimulatedEvent, ...]:
+    simulator = EventSimulator(use_case=use_case)
     events: list[SimulatedEvent] = []
     while (event := simulator.next_event()) is not None:
         events.append(event)

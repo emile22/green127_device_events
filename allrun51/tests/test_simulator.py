@@ -62,6 +62,18 @@ def test_catalog_runs_all_group_a_use_cases_in_numeric_order() -> None:
     ]
 
 
+def test_simulator_can_select_one_use_case() -> None:
+    events = generate_events(EventSeries.UC_2_13)
+    assert len(events) == EXPECTED_EVENT_COUNTS[EventSeries.UC_2_13]
+    assert all(event.series is EventSeries.UC_2_13 for event in events)
+    assert [event.sequence for event in events] == [f"U13-{index}" for index in range(8)]
+
+    simulator = EventSimulator(use_case=EventSeries.UC_2_13)
+    assert simulator.peek_next() is not None
+    assert simulator.peek_next().sequence == "U13-0"
+    assert len(tuple(iter(lambda: simulator.next_event(), None))) == 8
+
+
 def test_every_event_has_one_short_deterministic_sentence() -> None:
     events = generate_events()
     assert all(event.explanation.strip() for event in events)
