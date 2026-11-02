@@ -64,16 +64,21 @@ def run_demo(
     current_event: SimulatedEvent | None = None
     previous_event: SimulatedEvent | None = None
     current_data: dict[str, object] | None = None
-    visible_energy_object_ids: frozenset[str] | None = None
-    if simulator.use_case is not None:
-        scenario = simulator.network.scenarios_by_uc[simulator.use_case.value]
+
+    def visible_ids_for_series(series: EventSeries) -> frozenset[str]:
+        scenario = simulator.network.scenarios_by_uc[series.value]
         selected_topologies = set(scenario.topology_ids)
-        visible_energy_object_ids = frozenset(
+        return frozenset(
             energy_object_id
             for topology in simulator.network.topologies
             if topology.topology_id in selected_topologies
             for energy_object_id in topology.energy_object_ids
         )
+
+    first_spec = simulator.peek_next()
+    visible_energy_object_ids = (
+        visible_ids_for_series(first_spec.series) if first_spec is not None else frozenset()
+    )
     output_fn("GREEN allrun51 demo starting...")
 
     def disable_trace() -> None:
@@ -177,6 +182,9 @@ def run_demo(
         event = simulator.next_event()
         if event is None:
             break
+        visible_energy_object_ids = visible_ids_for_series(event.series)
+        if trace_tailer is not None:
+            trace_tailer.visible_energy_object_ids = visible_energy_object_ids
         if snapshot_fn is not None:
             try:
                 snapshot_fn(event)
@@ -195,8 +203,7 @@ def run_demo(
                 event_name=event.name,
             )
         data = event_to_yang(event, simulator.energy_objects)
-        if visible_energy_object_ids is not None:
-            data = filter_yang_instance_to_energy_objects(data, visible_energy_object_ids)
+        data = filter_yang_instance_to_energy_objects(data, visible_energy_object_ids)
         prior_event = current_event
         previous_event, current_event = current_event, event
         current_data = data

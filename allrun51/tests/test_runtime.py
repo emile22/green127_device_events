@@ -105,6 +105,9 @@ def test_human_and_raw_views_do_not_advance_the_event() -> None:
     assert any("1. HARDWARE INVENTORY" in line for line in output)
     assert any("3. ENERGY RELATIONSHIPS" in line for line in output)
     assert any('"ietf-power-and-energy:energy-objects"' in line for line in output)
+    json_view = next(line for line in output if '"ietf-power-and-energy:energy-objects"' in line)
+    assert '"eo-ap-1"' not in json_view
+    assert '"name": "ap-1"' not in json_view
     assert "<rpc-reply><data/></rpc-reply>" in output
     assert any("No previous event" in line for line in output)
 
