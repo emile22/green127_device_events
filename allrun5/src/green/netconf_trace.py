@@ -47,6 +47,82 @@ def _hardware_inventory(data: object) -> list[str] | None:
     return rows
 
 
+def filter_yang_instance_to_energy_objects(
+    data: dict[str, object],
+    visible_energy_object_ids: set[str] | frozenset[str],
+) -> dict[str, object]:
+    energy_key = "ietf-power-and-energy:energy-objects"
+    hardware_key = "ietf-hardware:hardware"
+    energy_root = data.get(energy_key)
+    hardware_root = data.get(hardware_key)
+    if not isinstance(energy_root, dict) or not isinstance(hardware_root, dict):
+        return data
+
+    all_objects = energy_root.get("energy-object")
+    all_components = hardware_root.get("component")
+    if not isinstance(all_objects, list) or not isinstance(all_components, list):
+        return data
+
+    selected_objects = []
+    selected_component_names: set[str] = set()
+    for item in all_objects:
+        if not isinstance(item, dict) or item.get("id") not in visible_energy_object_ids:
+            continue
+        selected = dict(item)
+        component_name = item.get("source-component-id")
+        if isinstance(component_name, str):
+            selected_component_names.add(component_name)
+
+        relationships = item.get("relationship")
+        if isinstance(relationships, list):
+            selected_relationships = []
+            for relationship in relationships:
+                if not isinstance(relationship, dict):
+                    continue
+                peers = relationship.get("peer")
+                if not isinstance(peers, list):
+                    continue
+                selected_peers = [
+                    peer for peer in peers
+                    if isinstance(peer, dict) and peer.get("id") in visible_energy_object_ids
+                ]
+                if selected_peers:
+                    selected_relationship = dict(relationship)
+                    selected_relationship["peer"] = selected_peers
+                    selected_relationships.append(selected_relationship)
+            if selected_relationships:
+                selected["relationship"] = selected_relationships
+            else:
+                selected.pop("relationship", None)
+        selected_objects.append(selected)
+
+    components_by_name = {
+        item["name"]: item
+        for item in all_components
+        if isinstance(item, dict) and isinstance(item.get("name"), str)
+    }
+    pending = list(selected_component_names)
+    while pending:
+        component = components_by_name.get(pending.pop())
+        if not component:
+            continue
+        parent = component.get("parent")
+        if isinstance(parent, str) and parent not in selected_component_names:
+            selected_component_names.add(parent)
+            pending.append(parent)
+
+    filtered_data = dict(data)
+    filtered_energy_root = dict(energy_root)
+    filtered_energy_root["energy-object"] = selected_objects
+    filtered_data[energy_key] = filtered_energy_root
+    filtered_hardware_root = dict(hardware_root)
+    filtered_hardware_root["component"] = [
+        item for name, item in components_by_name.items() if name in selected_component_names
+    ]
+    filtered_data[hardware_key] = filtered_hardware_root
+    return filtered_data
+
+
 def _energy_object_inventory(data: object) -> list[str] | None:
     if not isinstance(data, dict):
         return None
@@ -113,7 +189,10 @@ def _energy_object_inventory(data: object) -> list[str] | None:
     return rows
 
 
-def format_netconf_trace_entry(entry: str) -> str:
+def format_netconf_trace_entry(
+    entry: str,
+    visible_energy_object_ids: set[str] | frozenset[str] | None = None,
+) -> str:
     lines = entry.splitlines()
     header = next(
         (line for line in lines if line.startswith("[") and "] " in line),
@@ -135,6 +214,9 @@ def format_netconf_trace_entry(entry: str) -> str:
         formatted_payload = json.dumps(data, indent=2, ensure_ascii=False)
     except json.JSONDecodeError:
         formatted_payload = payload or "(empty)"
+    if isinstance(data, dict) and visible_energy_object_ids is not None:
+        data = filter_yang_instance_to_energy_objects(data, visible_energy_object_ids)
+        formatted_payload = json.dumps(data, indent=2, ensure_ascii=False)
     inventory = _hardware_inventory(data)
     energy_inventory = _energy_object_inventory(data)
 
@@ -173,10 +255,13 @@ class NetconfTraceTailer:
         trace_path: Path,
         output_fn: Callable[[str], None],
         poll_interval: float = 0.1,
+        *,
+        visible_energy_object_ids: set[str] | frozenset[str] | None = None,
     ) -> None:
         self.trace_path = trace_path
         self.output_fn = output_fn
         self.poll_interval = poll_interval
+        self.visible_energy_object_ids = visible_energy_object_ids
         self._stop_event = threading.Event()
         self._thread: threading.Thread | None = None
         try:
@@ -221,7 +306,7 @@ class NetconfTraceTailer:
                 return
         pending, _ = self._read_entries(stream, pending, offset)
         if pending.strip():
-            self.output_fn(format_netconf_trace_entry(pending))
+            self.output_fn(format_netconf_trace_entry(pending, self.visible_energy_object_ids))
         stream.close()
 
     def _read_entries(self, stream, pending: str, offset: int) -> tuple[str, int]:
@@ -231,5 +316,7 @@ class NetconfTraceTailer:
         while "\n\n" in pending:
             entry, pending = pending.split("\n\n", 1)
             if entry.strip():
-                self.output_fn(format_netconf_trace_entry(entry))
+                self.output_fn(
+                    format_netconf_trace_entry(entry, self.visible_energy_object_ids)
+                )
         return pending, offset

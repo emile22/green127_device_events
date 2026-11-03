@@ -123,6 +123,10 @@ is stopped or incomplete, runs pytest, then prompts between Group A events. It
 stops the WSL services on every exit. To keep services running after a demo,
 start them with the WSL script and run `python -m green` directly.
 
+The launcher uses Rich for colored NETCONF status messages and a pytest results
+table with per-test durations and a pass/fail summary. Rich is installed with the
+project dependencies by the setup command above.
+
 The launcher prefers `allrun51/.venv` when pytest, ncclient, and pyang are installed there. If that environment is incomplete, it uses the invoking interpreter and prepends `allrun51/src` to `PYTHONPATH`, so the allrun51 package is used rather than another installed GREEN package.
 
 To run all events automatically without delay, use `py .\allrun51\run.py --auto --interval 0`.
@@ -144,6 +148,7 @@ Controls:
 | `d` | Toggle live operational-data tracing and append records under `logs/`. |
 | `r` | Reset all scenario state and restart at UC 2.1 / U1-0. |
 | `q` | Exit cleanly. |
+| `map` | Show the current UC's topology membership, devices, Energy Objects, and event-visible relationships. |
 | `summary` | Display hardware, energy objects, relationships, and UC interpretation. |
 | `relationships` | Display the directional Energy Object graph. |
 | `json` | Display normalized full YANG JSON. |
@@ -153,6 +158,8 @@ Controls:
 The default event display prints its UC/event ID and explanation, followed by
 compact `HW`, `ENERGY`, `REL`, and `DIFF` lines. The `summary` command opens the
 detailed hardware inventory, Energy Objects, relationships, and UC interpretation.
+The Energy Object table keeps instantaneous `Power` separate from `Avg W`, which
+is derived from the current interval energy and duration when available.
 
 Every event has a deterministic explanation under 20 words. Runtime/controller metadata remains separate from YANG data. Missing measurements/capabilities remain unknown; interval and cumulative energy are distinct; cumulative counters reset only on `r`.
 

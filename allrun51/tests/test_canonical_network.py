@@ -37,6 +37,10 @@ def test_canonical_network_loads_all_archetypes_devices_topologies_and_use_cases
         "UC 2.1", "UC 2.2", "UC 2.5", "UC 2.6", "UC 2.7", "UC 2.8", "UC 2.9",
         "UC 2.10", "UC 2.11", "UC 2.12", "UC 2.13", "UC 2.14", "UC 2.15", "UC 2.16",
     }
+    assert network.scenarios_by_uc["UC 2.10"].topology_ids == (
+        "T1-fixed-network",
+        "T3-power-infrastructure",
+    )
     assert {
         item.device_id for topology in network.topologies for item in network.energy_objects
         if item.device_id in topology.device_ids

@@ -85,6 +85,15 @@ the WSL services on every exit. To keep services running after a demo, start
 them with the WSL script and run `python -m green` directly.
 
 For a noninteractive test-first run, use `python run.py --auto --interval 0`.
+To run one implemented use case, use `python run.py --uc 2.13` or
+`python -m green -u 2.13 --auto --interval 0`. The selector accepts values such
+as `2.13` and `"UC 2.13"`. A selected-UC launcher run skips the full pytest suite;
+run `python -m pytest -v` separately after code changes.
+
+When a UC is selected, inventory tables, compact event output, relationship
+diffs, NETCONF XML, and live trace tables are limited to Energy Objects on
+devices referenced by that UC's event data and relationship profiles. Hardware
+parent components needed to explain those objects remain visible.
 
 Controls:
 
@@ -95,11 +104,11 @@ Controls:
 | `d` | Toggle live operational-data tracing and append records under `logs/`. |
 | `r` | Reset all scenario state and restart at UC 2.1 / U1-0. |
 | `q` | Exit cleanly. |
-| `summary` | Display hardware, energy objects, relationships, and UC interpretation. |
+| `summary` | Display selected-device hardware, energy objects, relationships, and UC interpretation. |
 | `relationships` | Display the directional Energy Object graph. |
-| `json` | Display normalized full YANG JSON. |
-| `xml` | Fetch and display the actual NETCONF XML reply. |
-| `diff` | Compare relationship and observed-state changes with the previous event. |
+| `json` | Display normalized YANG JSON, scoped to the selected UC when applicable. |
+| `xml` | Fetch and display NETCONF XML, scoped to the selected UC when applicable. |
+| `diff` | Compare visible relationship and observed-state changes with the previous event. |
 
 The default event display prints its UC/event ID and explanation, followed by
 compact `HW`, `ENERGY`, `REL`, and `DIFF` lines. The `summary` command opens the

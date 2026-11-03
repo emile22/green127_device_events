@@ -5,9 +5,8 @@ from green.simulator import generate_events
 
 
 def test_trace_mode_logs_all_group_a_runtime_snapshots(monkeypatch, tmp_path: Path):
-    runtime_dir = Path(__file__).parents[1] / "runtime"
-    snapshot_path = runtime_dir / f"trace-test-{tmp_path.name}.json"
-    trace_path = Path(__file__).parents[1] / "logs" / f"trace-test-{tmp_path.name}.log"
+    snapshot_path = tmp_path / "operational.json"
+    trace_path = tmp_path / "netconf-trace.log"
     monkeypatch.setenv("GREEN_NETCONF_TRACE_FILE", str(trace_path))
     set_netconf_trace_enabled(True, snapshot_path)
     try:
@@ -22,8 +21,8 @@ def test_trace_mode_logs_all_group_a_runtime_snapshots(monkeypatch, tmp_path: Pa
         Path(f"{snapshot_path}.netconf-context").unlink(missing_ok=True)
         Path(f"{snapshot_path}.netconf-trace-enabled").unlink(missing_ok=True)
 
-        assert len(events) == 122
-        assert trace.count("operation: runtime snapshot") == 122
+    assert len(events) == 122
+    assert trace.count("operation: runtime snapshot") == 122
     for event in events:
         assert event.sequence in trace
         assert f"{event.series.value} - " in trace

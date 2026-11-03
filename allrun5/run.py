@@ -8,10 +8,13 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 from textwrap import wrap
 
+_wsl_keepalive: subprocess.Popen | None = None
+
 project_source = str(Path(__file__).resolve().parent / "src")
 if project_source not in sys.path:
     sys.path.insert(0, project_source)
 
+from green.cli import SUPPORTED_USE_CASE_IDS, parse_use_case
 from green.topology import demo_energy_objects
 
 
@@ -44,6 +47,51 @@ def _wsl_project_path(project_dir: Path) -> str:
         drive = project_dir.drive[0].lower()
         return f"/mnt/{drive}{project_dir.as_posix()[2:]}"
     return str(project_dir)
+
+
+def _start_wsl_keepalive() -> bool:
+    global _wsl_keepalive
+    if os.name != "nt":
+        return True
+    if _wsl_keepalive is not None:
+        if _wsl_keepalive.poll() is None:
+            return True
+        _wsl_keepalive = None
+
+    try:
+        _wsl_keepalive = subprocess.Popen(
+            ["wsl.exe", "--exec", "/bin/cat"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        )
+    except OSError as error:
+        print(f"Could not keep WSL session alive: {error}")
+        return False
+
+    if _wsl_keepalive.poll() is not None:
+        print("Could not keep WSL session alive: wsl.exe exited immediately.")
+        _wsl_keepalive = None
+        return False
+    return True
+
+
+def _stop_wsl_keepalive() -> None:
+    global _wsl_keepalive
+    process = _wsl_keepalive
+    _wsl_keepalive = None
+    if process is None:
+        return
+
+    try:
+        if process.stdin is not None:
+            process.stdin.close()
+        process.wait(timeout=5)
+    except (OSError, subprocess.TimeoutExpired):
+        if process.poll() is None:
+            process.terminate()
+            process.wait(timeout=5)
 
 
 def _hardware_component_ties() -> list[str]:
@@ -102,6 +150,8 @@ def _print_netconf_ready(project_dir: Path) -> None:
 
 
 def ensure_netconf_services() -> bool:
+    if not _start_wsl_keepalive():
+        return False
     project_dir = Path(__file__).resolve().parent
     wsl_project = _wsl_project_path(project_dir)
     expected_environment = (
@@ -174,23 +224,33 @@ def stop_netconf_services() -> None:
         result = subprocess.run(command, check=False, capture_output=True, text=True)
     except OSError as error:
         print(f"Warning: could not stop NETCONF services: {error}")
+        _stop_wsl_keepalive()
         return
 
     output = result.stdout.strip()
     if result.returncode == 0:
         if output:
             print(output)
+        _stop_wsl_keepalive()
         return
     detail = result.stderr.strip() or output
     print(f"Warning: could not stop NETCONF services (exit {result.returncode}).")
     if detail:
         print(detail)
+    _stop_wsl_keepalive()
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Test and run the GREEN allrun5 simulator")
     parser.add_argument("--auto", action="store_true", help="run all events without prompting")
     parser.add_argument("--interval", type=float, help="automatic-mode delay in seconds")
+    parser.add_argument(
+        "-u",
+        "--uc",
+        type=parse_use_case,
+        metavar="UC",
+        help=f"run only one implemented UC (available: {', '.join(SUPPORTED_USE_CASE_IDS)})",
+    )
     args = parser.parse_args(argv)
     if args.interval is not None and args.interval < 0:
         parser.error("--interval must be non-negative")
@@ -201,22 +261,32 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 1
         project_dir = Path(__file__).resolve().parent
         python = project_python()
-        tests = subprocess.run(
-            [python, "-m", "pytest", "-v"],
-            check=False,
-            stdin=subprocess.DEVNULL,
-            cwd=project_dir,
-        )
-        if tests.returncode != 0:
-            pause_for_review("\nTests failed. Press ENTER to review the trace...", input)
-            return tests.returncode
+        if args.uc is None:
+            tests = subprocess.run(
+                [python, "-m", "pytest", "-v"],
+                check=False,
+                stdin=subprocess.DEVNULL,
+                cwd=project_dir,
+            )
+            if tests.returncode != 0:
+                pause_for_review("\nTests failed. Press ENTER to review the trace...", input)
+                return tests.returncode
+            print("\nAll tests passed. Starting the GREEN runtime...\n", flush=True)
+        else:
+            print(
+                f"Skipping full pytest suite for selected {args.uc.value}; "
+                "run python -m pytest -v separately after code changes.",
+                flush=True,
+            )
+            print(f"\nStarting selected {args.uc.value}...\n", flush=True)
 
-        print("\nAll tests passed. Starting the GREEN runtime...\n", flush=True)
         runtime_command = [python, "-m", "green"]
         if args.auto:
             runtime_command.append("--auto")
         if args.interval is not None:
             runtime_command.extend(("--interval", str(args.interval)))
+        if args.uc is not None:
+            runtime_command.extend(("--uc", args.uc.value.removeprefix("UC ")))
         runtime = subprocess.run(runtime_command, check=False, cwd=project_dir)
         pause_for_review("\nGREEN runtime ended. Press ENTER to review the trace...", input)
         return runtime.returncode

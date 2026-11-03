@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "green-allrun51"
 version = "0.1.0"
 requires-python = "==3.11.*"
+dependencies = ["rich>=13.9"]
 
 [project.optional-dependencies]
 test = ["pytest>=8", "pyang>=2.6.1", "ncclient>=0.6.15"]

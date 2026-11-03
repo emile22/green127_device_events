@@ -4,6 +4,7 @@ from green.catalog import EVENT_CATALOG, EventSpec, relationships_for_profiles
 from green.models import (
     ComponentState,
     EnergyObject,
+    EventSeries,
     MetricType,
     RawEnergyMeasurement,
     RawPowerMeasurement,
@@ -13,17 +14,28 @@ from green.topology import demo_energy_objects
 
 
 class EventSimulator:
-    def __init__(self, energy_objects: tuple[EnergyObject, ...] | None = None) -> None:
+    def __init__(
+        self,
+        energy_objects: tuple[EnergyObject, ...] | None = None,
+        *,
+        use_case: EventSeries | None = None,
+    ) -> None:
         self.energy_objects = energy_objects or demo_energy_objects()
+        self.use_case = use_case
+        self._event_specs = tuple(
+            (index, spec)
+            for index, spec in enumerate(EVENT_CATALOG)
+            if use_case is None or spec.series is use_case
+        )
         self._objects_by_id = {item.energy_object_id: item for item in self.energy_objects}
         self.reset()
 
     @property
     def has_next(self) -> bool:
-        return self._index < len(EVENT_CATALOG)
+        return self._index < len(self._event_specs)
 
     def peek_next(self) -> EventSpec | None:
-        return EVENT_CATALOG[self._index] if self.has_next else None
+        return self._event_specs[self._index][1] if self.has_next else None
 
     def reset(self) -> None:
         self._index = 0
@@ -36,8 +48,7 @@ class EventSimulator:
         if not self.has_next:
             return None
 
-        event_index = self._index
-        definition = EVENT_CATALOG[event_index]
+        event_index, definition = self._event_specs[self._index]
         sequence = definition.sequence
         self._component_states.update(dict(definition.component_states))
         timestamp = (

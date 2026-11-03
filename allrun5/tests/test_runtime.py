@@ -4,6 +4,7 @@ from types import SimpleNamespace
 import pytest
 
 from green.__main__ import main, run_demo
+from green.models import EventSeries
 from green.simulator import EventSimulator
 import run
 
@@ -50,6 +51,18 @@ def test_a_runs_remaining_events_across_all_uc_boundaries() -> None:
     assert "Group B deferred: 2 use cases" in output
     assert sum(line.startswith("--- UC ") for line in output) == 14
     assert sum(" complete -> UC " in line for line in output) == 13
+
+
+def test_simulator_runs_only_the_selected_use_case() -> None:
+    simulator = EventSimulator(use_case=EventSeries.UC_2_13)
+    events = []
+    while (event := simulator.next_event()) is not None:
+        events.append(event)
+
+    assert len(events) == 8
+    assert all(event.series is EventSeries.UC_2_13 for event in events)
+    assert events[0].sequence == "U13-0"
+    assert events[-1].sequence == "U13-7"
 
 
 def test_q_exits_without_advancing() -> None:
@@ -125,6 +138,23 @@ def test_auto_main_runs_every_event_and_writes_every_snapshot() -> None:
     assert snapshots[0].sequence == "U1-0"
     assert snapshots[-1].sequence == "U16-9"
     assert trace_states == [False]
+
+
+def test_main_runs_only_the_selected_use_case() -> None:
+    output: list[str] = []
+    main(
+        ["-u", "UC 2.13", "--auto", "--interval", "0"],
+        sleep_fn=lambda _: None,
+        output_fn=output.append,
+        snapshot_fn=None,
+        trace_fn=lambda _: Path("trace.log"),
+    )
+
+    events = event_lines(output)
+    assert len(events) == 8
+    assert all(line.startswith("[UC 2.13 /") for line in events)
+    assert "UC 2.13 completed" in output
+    assert "Group A completed: 14 use cases" not in output
 
 
 def test_launcher_prefers_project_virtualenv(tmp_path: Path, monkeypatch) -> None:
@@ -210,6 +240,29 @@ def test_launcher_passes_optional_runtime_arguments(monkeypatch) -> None:
     assert working_directories[:2] == [project_dir, project_dir]
 
 
+def test_launcher_forwards_selected_use_case_without_running_full_suite(
+    monkeypatch,
+    capsys,
+) -> None:
+    commands: list[list[str]] = []
+
+    def fake_run(command: list[str], **_kwargs):
+        commands.append(command)
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(run, "project_python", lambda: "project-python")
+    monkeypatch.setattr(run, "ensure_netconf_services", lambda: True)
+    monkeypatch.setattr(run.subprocess, "run", fake_run)
+    monkeypatch.setattr(run, "pause_for_review", lambda *_args: None)
+
+    assert run.main(["-u", "2.13", "--auto"]) == 0
+    assert commands[0] == [
+        "project-python", "-m", "green", "--auto", "--uc", "2.13"
+    ]
+    assert len(commands) == 2
+    assert "Skipping full pytest suite for selected UC 2.13" in capsys.readouterr().out
+
+
 def test_allrun5_netconf_ready_display_includes_process_pids_and_siblings(monkeypatch, capsys) -> None:
     commands: list[list[str]] = []
 
@@ -222,6 +275,7 @@ def test_allrun5_netconf_ready_display_includes_process_pids_and_siblings(monkey
         return SimpleNamespace(returncode=0, stdout="101\n202\n", stderr="")
 
     monkeypatch.setattr(run.subprocess, "run", fake_run)
+    monkeypatch.setattr(run, "_start_wsl_keepalive", lambda: True)
 
     assert run.ensure_netconf_services()
     output = capsys.readouterr().out
@@ -232,3 +286,48 @@ def test_allrun5_netconf_ready_display_includes_process_pids_and_siblings(monkey
     assert "eo-router-a-linecard-2/linecard-2" in output
     assert "[siblings]" in output
     assert any("sysrepo-plugind.service" in command[-1] for command in commands)
+
+
+def test_windows_netconf_run_holds_and_releases_wsl_session(monkeypatch) -> None:
+    calls: list[tuple[list[str], dict[str, object]]] = []
+    lifecycle: list[str] = []
+
+    class FakeStdin:
+        def close(self) -> None:
+            lifecycle.append("stdin-closed")
+
+    class FakeProcess:
+        stdin = FakeStdin()
+
+        def poll(self) -> None:
+            return None
+
+        def wait(self, timeout: float) -> None:
+            lifecycle.append(f"waited-{timeout}")
+
+    process = FakeProcess()
+
+    def fake_popen(command: list[str], **kwargs: object) -> FakeProcess:
+        calls.append((command, kwargs))
+        return process
+
+    monkeypatch.setattr(run, "os", SimpleNamespace(name="nt"))
+    monkeypatch.setattr(run, "_wsl_keepalive", None)
+    monkeypatch.setattr(run.subprocess, "Popen", fake_popen)
+
+    assert run._start_wsl_keepalive()
+    assert calls == [
+        (
+            ["wsl.exe", "--exec", "/bin/cat"],
+            {
+                "stdin": run.subprocess.PIPE,
+                "stdout": run.subprocess.DEVNULL,
+                "stderr": run.subprocess.DEVNULL,
+                "creationflags": getattr(run.subprocess, "CREATE_NO_WINDOW", 0),
+            },
+        )
+    ]
+
+    run._stop_wsl_keepalive()
+    assert lifecycle == ["stdin-closed", "waited-5"]
+    assert run._wsl_keepalive is None

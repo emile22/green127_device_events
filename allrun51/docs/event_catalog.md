@@ -595,65 +595,65 @@ Event IDs and descriptions are simulator-specific and are not standardized IETF 
 ### U10-0 - TRAFFIC_HIGH
 
 - Description: High traffic keeps both components active and produces the highest normal energy demand.
-- Main state/data: eo-server-a=active; eo-server-b=active; eo-upstream-meter=300 Wh interval, 300 Wh cumulative; eo-server-a=120 Wh interval, 120 Wh cumulative; eo-server-b=180 Wh interval, 180 Wh cumulative
+- Main state/data: eo-server-a=active; eo-server-b=active; eo-router-a=500 W; eo-router-b=480 W; eo-upstream-meter=300 Wh interval, 300 Wh cumulative; eo-server-a=120 Wh interval, 120 Wh cumulative; eo-server-b=180 Wh interval, 180 Wh cumulative
 - Relationship families: metering / metered-by, enabling / enabled-by
-- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, energy/total-energy-consumed, relationship/type,peer/id
+- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, power/instantaneous-power, energy/total-energy-consumed, relationship/type,peer/id
 - Simulator-only metadata: none
 
 ### U10-1 - TRAFFIC_LOW
 
 - Description: Lower traffic reduces component activity and decreases measured energy consumption.
-- Main state/data: eo-server-a=active; eo-server-b=active; eo-upstream-meter=150 Wh interval, 450 Wh cumulative; eo-server-a=60 Wh interval, 180 Wh cumulative; eo-server-b=90 Wh interval, 270 Wh cumulative
+- Main state/data: eo-server-a=active; eo-server-b=active; eo-router-a=340 W; eo-router-b=330 W; eo-upstream-meter=150 Wh interval, 450 Wh cumulative; eo-server-a=60 Wh interval, 180 Wh cumulative; eo-server-b=90 Wh interval, 270 Wh cumulative
 - Relationship families: metering / metered-by, enabling / enabled-by
-- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, energy/total-energy-consumed, relationship/type,peer/id
+- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, power/instantaneous-power, energy/total-energy-consumed, relationship/type,peer/id
 - Simulator-only metadata: none
 
 ### U10-2 - COMPONENT_SLEEP
 
 - Description: Low traffic lets server-B enter low-power mode and reduce consumption.
-- Main state/data: eo-server-a=active; eo-server-b=low-power; eo-upstream-meter=80 Wh interval, 530 Wh cumulative; eo-server-a=60 Wh interval, 240 Wh cumulative; eo-server-b=20 Wh interval, 290 Wh cumulative
+- Main state/data: eo-server-a=active; eo-server-b=low-power; eo-router-a=220 W; eo-router-b=390 W; eo-upstream-meter=80 Wh interval, 530 Wh cumulative; eo-server-a=60 Wh interval, 240 Wh cumulative; eo-server-b=20 Wh interval, 290 Wh cumulative
 - Relationship families: metering / metered-by, enabling / enabled-by
-- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, energy/total-energy-consumed, relationship/type,peer/id
+- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, power/instantaneous-power, energy/total-energy-consumed, relationship/type,peer/id
 - Simulator-only metadata: none
 
 ### U10-3 - TRAFFIC_BURST
 
 - Description: A sudden traffic burst wakes server-B and sharply increases energy consumption.
-- Main state/data: eo-server-a=active; eo-server-b=active; eo-upstream-meter=360 Wh interval, 890 Wh cumulative; eo-server-a=150 Wh interval, 390 Wh cumulative; eo-server-b=210 Wh interval, 500 Wh cumulative
+- Main state/data: eo-server-a=active; eo-server-b=active; eo-router-a=460 W; eo-router-b=470 W; eo-upstream-meter=360 Wh interval, 890 Wh cumulative; eo-server-a=150 Wh interval, 390 Wh cumulative; eo-server-b=210 Wh interval, 500 Wh cumulative
 - Relationship families: metering / metered-by, enabling / enabled-by
-- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, energy/total-energy-consumed, relationship/type,peer/id
+- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, power/instantaneous-power, energy/total-energy-consumed, relationship/type,peer/id
 - Simulator-only metadata: none
 
 ### U10-4 - METERED_INTERVAL_RECORDED
 
 - Description: A new interval records upstream and component energy without changing cumulative semantics.
-- Main state/data: eo-upstream-meter=320 Wh interval, 1210 Wh cumulative; eo-server-a=130 Wh interval, 520 Wh cumulative; eo-server-b=190 Wh interval, 690 Wh cumulative
+- Main state/data: eo-router-a=490 W; eo-router-b=470 W; eo-upstream-meter=320 Wh interval, 1210 Wh cumulative; eo-server-a=130 Wh interval, 520 Wh cumulative; eo-server-b=190 Wh interval, 690 Wh cumulative
 - Relationship families: metering / metered-by, enabling / enabled-by
-- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, energy/total-energy-consumed, relationship/type,peer/id
+- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, power/instantaneous-power, energy/total-energy-consumed, relationship/type,peer/id
 - Simulator-only metadata: none
 
 ### U10-5 - SLEEP_STATE_VERIFIED
 
 - Description: The low-power component state and its interval measurement are observed together.
-- Main state/data: eo-server-a=active; eo-server-b=low-power; eo-upstream-meter=90 Wh interval, 1300 Wh cumulative; eo-server-a=65 Wh interval, 585 Wh cumulative; eo-server-b=25 Wh interval, 715 Wh cumulative
+- Main state/data: eo-server-a=active; eo-server-b=low-power; eo-router-a=280 W; eo-router-b=420 W; eo-upstream-meter=90 Wh interval, 1300 Wh cumulative; eo-server-a=65 Wh interval, 585 Wh cumulative; eo-server-b=25 Wh interval, 715 Wh cumulative
 - Relationship families: metering / metered-by, enabling / enabled-by
-- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, energy/total-energy-consumed, relationship/type,peer/id
+- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, power/instantaneous-power, energy/total-energy-consumed, relationship/type,peer/id
 - Simulator-only metadata: none
 
 ### U10-6 - WAKE_RESPONSE_MEASURED
 
 - Description: A returning workload wakes server-B and produces a distinct energy interval.
-- Main state/data: eo-server-a=active; eo-server-b=active; eo-upstream-meter=240 Wh interval, 1540 Wh cumulative; eo-server-a=110 Wh interval, 695 Wh cumulative; eo-server-b=130 Wh interval, 845 Wh cumulative
+- Main state/data: eo-server-a=active; eo-server-b=active; eo-router-a=360 W; eo-router-b=440 W; eo-upstream-meter=240 Wh interval, 1540 Wh cumulative; eo-server-a=110 Wh interval, 695 Wh cumulative; eo-server-b=130 Wh interval, 845 Wh cumulative
 - Relationship families: metering / metered-by, enabling / enabled-by
-- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, energy/total-energy-consumed, relationship/type,peer/id
+- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, power/instantaneous-power, energy/total-energy-consumed, relationship/type,peer/id
 - Simulator-only metadata: none
 
 ### U10-7 - RECOVERY_INTERVAL_CONFIRMED
 
 - Description: The recovered service interval is reconciled with its upstream meter relationships.
-- Main state/data: eo-upstream-meter=340 Wh interval, 1880 Wh cumulative; eo-server-a=140 Wh interval, 835 Wh cumulative; eo-server-b=200 Wh interval, 1045 Wh cumulative
+- Main state/data: eo-router-a=470 W; eo-router-b=475 W; eo-upstream-meter=340 Wh interval, 1880 Wh cumulative; eo-server-a=140 Wh interval, 835 Wh cumulative; eo-server-b=200 Wh interval, 1045 Wh cumulative
 - Relationship families: metering / metered-by, enabling / enabled-by
-- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, energy/total-energy-consumed, relationship/type,peer/id
+- YANG-visible data: RFC 8348 inventory, source-component-id, power-state/oper, power/instantaneous-power, energy/total-energy-consumed, relationship/type,peer/id
 - Simulator-only metadata: none
 
 ## UC 2.11 - Energy Efficiency Network Management

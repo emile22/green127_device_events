@@ -1,5 +1,7 @@
 import json
 import os
+import tempfile
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -46,9 +48,7 @@ def write_operational_snapshot(
             f"{series} - {title} | {event.sequence} {event.name}\n",
             encoding="utf-8",
         )
-    temporary_path = destination.with_suffix(destination.suffix + ".tmp")
-    temporary_path.write_text(json.dumps(snapshot, indent=2) + "\n", encoding="utf-8")
-    temporary_path.replace(destination)
+    _write_text_atomically(destination, json.dumps(snapshot, indent=2) + "\n")
     if trace_enabled:
         timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         trace_path = _trace_path(destination)
@@ -88,10 +88,37 @@ def set_netconf_trace_enabled(
     control_path = Path(f"{destination}.netconf-trace-enabled")
     trace_path = _trace_path(destination)
     control_path.parent.mkdir(parents=True, exist_ok=True)
-    temporary_path = control_path.with_suffix(control_path.suffix + ".tmp")
-    temporary_path.write_text("1\n" if enabled else "0\n", encoding="ascii")
-    temporary_path.replace(control_path)
+    _write_text_atomically(control_path, "1\n" if enabled else "0\n", encoding="ascii")
     return trace_path
+
+
+def _write_text_atomically(
+    destination: Path,
+    contents: str,
+    *,
+    encoding: str = "utf-8",
+) -> None:
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{destination.name}.",
+        suffix=".tmp",
+        dir=destination.parent,
+    )
+    temporary_path = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "w", encoding=encoding, newline="\n") as output_file:
+            output_file.write(contents)
+            output_file.flush()
+            os.fsync(output_file.fileno())
+        for attempt in range(8):
+            try:
+                os.replace(temporary_path, destination)
+                return
+            except PermissionError:
+                if attempt == 7:
+                    raise
+                time.sleep(0.01 * (attempt + 1))
+    finally:
+        temporary_path.unlink(missing_ok=True)
 
 
 def _trace_path(destination: Path) -> Path:

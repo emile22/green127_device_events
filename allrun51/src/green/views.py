@@ -1,11 +1,13 @@
 import json
 import os
 import socket
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
+from green.canonical_network import CanonicalNetwork
 from green.catalog import USE_CASES_BY_SERIES
-from green.models import AccountingResult, EnergyObject, SimulatedEvent
+from green.models import AccountingResult, EnergyObject, EnergyRelationship, SimulatedEvent
 from green.netconf_trace import (
     _energy_object_inventory,
     _hardware_inventory,
@@ -92,7 +94,10 @@ def render_summary(
         "ietf-power-and-energy:energy-objects": {"energy-object": selected_objects},
     }
     hardware_rows = _hardware_inventory(summary_data) or ["HARDWARE INVENTORY", "(no related hardware)"]
-    energy_rows = _energy_object_inventory(summary_data) or ["GREEN ENERGY OBJECTS", "(no related Energy Objects)"]
+    energy_rows = _energy_object_inventory(
+        summary_data,
+        interval_energy_measurements=event.measurements,
+    ) or ["GREEN ENERGY OBJECTS", "(no related Energy Objects)"]
     sections = [
         "1. HARDWARE INVENTORY",
         *hardware_rows[1:],
@@ -107,6 +112,50 @@ def render_summary(
         render_interpretation(event),
     ]
     return "\n".join(sections)
+
+
+def render_network_map(
+    network: CanonicalNetwork,
+    topology_ids: tuple[str, ...],
+    relationships: tuple[EnergyRelationship, ...],
+) -> str:
+    selected_topologies = [
+        topology
+        for topology in network.topologies
+        if topology.topology_id in topology_ids
+    ]
+    topology_memberships: dict[str, int] = {}
+    for topology in selected_topologies:
+        for device_id in topology.device_ids:
+            topology_memberships[device_id] = topology_memberships.get(device_id, 0) + 1
+
+    devices_by_id = network.devices_by_id
+    archetypes_by_id = network.archetypes_by_id
+    objects_by_id = {item.energy_object_id: item for item in network.energy_objects}
+    lines = ["NETWORK MAP", f"Network: {network.network_id}"]
+    for topology in selected_topologies:
+        lines.extend(["", f"{topology.topology_id} | {topology.name}"])
+        for device_id in topology.device_ids:
+            device = devices_by_id[device_id]
+            archetype = archetypes_by_id[device.archetype_id]
+            shared = " [shared]" if topology_memberships[device_id] > 1 else ""
+            lines.append(f"  {device.name} ({device.device_id}) | {archetype.name}{shared}")
+            for object_id in topology.energy_object_ids:
+                energy_object = objects_by_id[object_id]
+                if energy_object.device_id == device_id:
+                    component_name = energy_object.hardware_component_name or "unmapped"
+                    lines.append(f"    {object_id} [{component_name}]")
+
+    lines.extend(["", "GREEN Energy Object relationships (event-visible):"])
+    if relationships:
+        lines.extend(
+            f"  {item.source_energy_object_id} --{item.relationship_type.value}--> "
+            f"{item.peer_energy_object_id}"
+            for item in relationships
+        )
+    else:
+        lines.append("  (none)")
+    return "\n".join(lines)
 
 
 def render_compact_event(
@@ -338,7 +387,70 @@ def render_relationship_diff(
     return "\n".join(lines)
 
 
-def fetch_netconf_xml() -> str:
+def filter_netconf_xml_to_energy_objects(
+    xml: str,
+    visible_energy_object_ids: set[str] | frozenset[str],
+) -> str:
+    netconf_ns = "urn:ietf:params:xml:ns:netconf:base:1.0"
+    hardware_ns = "urn:ietf:params:xml:ns:yang:ietf-hardware"
+    energy_ns = "urn:ietf:params:xml:ns:yang:ietf-power-and-energy"
+    root = ET.fromstring(xml)
+    data = root.find(f".//{{{netconf_ns}}}data")
+    if data is None and root.tag == f"{{{netconf_ns}}}data":
+        data = root
+    if data is None:
+        return xml
+
+    energy_objects = data.find(f"{{{energy_ns}}}energy-objects")
+    hardware = data.find(f"{{{hardware_ns}}}hardware")
+    if energy_objects is None or hardware is None:
+        return xml
+
+    selected_component_names: set[str] = set()
+    for energy_object in list(energy_objects.findall(f"{{{energy_ns}}}energy-object")):
+        object_id = energy_object.findtext(f"{{{energy_ns}}}id")
+        if object_id not in visible_energy_object_ids:
+            energy_objects.remove(energy_object)
+            continue
+
+        component_name = energy_object.findtext(f"{{{energy_ns}}}source-component-id")
+        if component_name:
+            selected_component_names.add(component_name)
+
+        for relationship in list(energy_object.findall(f"{{{energy_ns}}}relationship")):
+            for peer in list(relationship.findall(f"{{{energy_ns}}}peer")):
+                peer_id = peer.findtext(f"{{{energy_ns}}}id")
+                if peer_id not in visible_energy_object_ids:
+                    relationship.remove(peer)
+            if not relationship.findall(f"{{{energy_ns}}}peer"):
+                energy_object.remove(relationship)
+
+    components = hardware.findall(f"{{{hardware_ns}}}component")
+    components_by_name = {
+        component.findtext(f"{{{hardware_ns}}}name"): component
+        for component in components
+        if component.findtext(f"{{{hardware_ns}}}name")
+    }
+    pending = list(selected_component_names)
+    while pending:
+        component = components_by_name.get(pending.pop())
+        if component is None:
+            continue
+        parent = component.findtext(f"{{{hardware_ns}}}parent")
+        if parent and parent not in selected_component_names:
+            selected_component_names.add(parent)
+            pending.append(parent)
+
+    for component in list(components):
+        component_name = component.findtext(f"{{{hardware_ns}}}name")
+        if component_name not in selected_component_names:
+            hardware.remove(component)
+    return ET.tostring(root, encoding="unicode")
+
+
+def fetch_netconf_xml(
+    visible_energy_object_ids: set[str] | frozenset[str] | None = None,
+) -> str:
     config_path = Path(__file__).resolve().parents[2] / "runtime" / "netconf" / "connection.env"
     config: dict[str, str] = {}
     if config_path.is_file():
@@ -383,6 +495,8 @@ def fetch_netconf_xml() -> str:
     )
     try:
         reply = session.get()
-        return reply.xml
+        if visible_energy_object_ids is None:
+            return reply.xml
+        return filter_netconf_xml_to_energy_objects(reply.xml, visible_energy_object_ids)
     finally:
         session.close_session()
