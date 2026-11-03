@@ -67,12 +67,8 @@ def run_demo(
     visible_energy_object_ids: frozenset[str] | None = None
     if simulator.use_case is not None:
         scenario = simulator.network.scenarios_by_uc[simulator.use_case.value]
-        selected_topologies = set(scenario.topology_ids)
-        visible_energy_object_ids = frozenset(
-            energy_object_id
-            for topology in simulator.network.topologies
-            if topology.topology_id in selected_topologies
-            for energy_object_id in topology.energy_object_ids
+        visible_energy_object_ids = _visible_energy_object_ids(
+            simulator, scenario.topology_ids
         )
     output_fn("GREEN allrun51 demo starting...")
 
@@ -182,6 +178,12 @@ def run_demo(
         event = simulator.next_event()
         if event is None:
             break
+        if simulator.use_case is None:
+            visible_energy_object_ids = _visible_energy_object_ids(
+                simulator, event.topology_ids
+            )
+            if trace_tailer is not None:
+                trace_tailer.visible_energy_object_ids = visible_energy_object_ids
         if snapshot_fn is not None:
             try:
                 snapshot_fn(event)
@@ -250,6 +252,19 @@ def _display_event(
         if use_color and line.startswith("["):
             line = f"\x1b[32m{line}\x1b[0m"
         output_fn(line)
+
+
+def _visible_energy_object_ids(
+    simulator: EventSimulator,
+    topology_ids: Sequence[str],
+) -> frozenset[str]:
+    selected_topologies = set(topology_ids)
+    return frozenset(
+        energy_object_id
+        for topology in simulator.network.topologies
+        if topology.topology_id in selected_topologies
+        for energy_object_id in topology.energy_object_ids
+    )
 
 
 def main(
