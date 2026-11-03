@@ -5,7 +5,7 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 
 from green.accounting import AccountingEngine
-from green.catalog import UC_CATALOG, USE_CASES_BY_SERIES
+from green.catalog import EVENT_CATALOG, UC_CATALOG, USE_CASES_BY_SERIES
 from green.models import AccountingResult, EventSeries, SimulatedEvent
 from green.netconf_bridge import set_netconf_trace_enabled, write_operational_snapshot
 from green.netconf_trace import NetconfTraceTailer
@@ -67,8 +67,8 @@ def run_demo(
     visible_energy_object_ids: frozenset[str] | None = None
     if simulator.use_case is not None:
         scenario = simulator.network.scenarios_by_uc[simulator.use_case.value]
-        visible_energy_object_ids = _visible_energy_object_ids(
-            simulator, scenario.topology_ids
+        visible_energy_object_ids = _visible_energy_object_ids_for_use_case(
+            simulator, simulator.use_case, scenario.topology_ids
         )
     output_fn("GREEN allrun51 demo starting...")
 
@@ -178,12 +178,11 @@ def run_demo(
         event = simulator.next_event()
         if event is None:
             break
-        if simulator.use_case is None:
-            visible_energy_object_ids = _visible_energy_object_ids(
-                simulator, event.topology_ids
-            )
-            if trace_tailer is not None:
-                trace_tailer.visible_energy_object_ids = visible_energy_object_ids
+        visible_energy_object_ids = _visible_energy_object_ids_for_use_case(
+            simulator, event.series, event.topology_ids
+        )
+        if trace_tailer is not None:
+            trace_tailer.visible_energy_object_ids = visible_energy_object_ids
         if snapshot_fn is not None:
             try:
                 snapshot_fn(event)
@@ -265,6 +264,25 @@ def _visible_energy_object_ids(
         if topology.topology_id in selected_topologies
         for energy_object_id in topology.energy_object_ids
     )
+
+
+def _visible_energy_object_ids_for_use_case(
+    simulator: EventSimulator,
+    series: EventSeries,
+    topology_ids: Sequence[str],
+) -> frozenset[str]:
+    topology_object_ids = _visible_energy_object_ids(simulator, topology_ids)
+    use_case_value_ids = {
+        energy_object_id
+        for event in EVENT_CATALOG
+        if event.series is series
+        for energy_object_id, _ in (
+            *event.interval_energy_wh,
+            *event.instantaneous_power_w,
+            *event.component_states,
+        )
+    }
+    return frozenset(topology_object_ids & use_case_value_ids)
 
 
 def main(
