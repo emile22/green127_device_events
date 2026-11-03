@@ -62,6 +62,30 @@ def test_catalog_runs_all_group_a_use_cases_in_numeric_order() -> None:
     ]
 
 
+def test_selected_use_case_nicknames_survive_event_expansion() -> None:
+    nicknames = {use_case.series: use_case.nickname for use_case in UC_CATALOG}
+
+    assert nicknames[EventSeries.UC_2_1] == "Incremental"
+    assert nicknames[EventSeries.UC_2_2] == "Proportional"
+    assert nicknames[EventSeries.UC_2_5] == "Indirect_meter"
+    assert nicknames[EventSeries.UC_2_8] == "Video streaming"
+    assert nicknames[EventSeries.UC_2_9] == "WLAN"
+    assert nicknames[EventSeries.UC_2_12] == "Smart-City"
+    assert nicknames[EventSeries.UC_2_16] == "Cross-Layer"
+    assert all(
+        len(nickname.replace("_", " ").replace("-", " ").split()) <= 2
+        for nickname in (
+            nicknames[EventSeries.UC_2_1],
+            nicknames[EventSeries.UC_2_2],
+            nicknames[EventSeries.UC_2_5],
+            nicknames[EventSeries.UC_2_8],
+            nicknames[EventSeries.UC_2_9],
+            nicknames[EventSeries.UC_2_12],
+            nicknames[EventSeries.UC_2_16],
+        )
+    )
+
+
 def test_simulator_can_select_one_use_case() -> None:
     events = generate_events(EventSeries.UC_2_13)
     assert len(events) == EXPECTED_EVENT_COUNTS[EventSeries.UC_2_13]

@@ -54,6 +54,7 @@ class EventSpec:
 class UseCaseSpec:
     series: EventSeries
     title: str
+    nickname: str | None
     events: tuple[EventSpec, ...]
 
 
@@ -174,6 +175,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_1,
         "Incremental Application of the GREEN Framework",
+        "Incremental",
         (
             _event(EventSeries.UC_2_1, "U1-0", "LEGACY_BASELINE",
                    "Legacy equipment begins with vendor reference data but no direct GREEN telemetry.",
@@ -197,11 +199,12 @@ UC_CATALOG = (
                    metadata=(("router-A-data-classification", "measured"),
                              ("router-B-data-classification", "measured"),
                              ("network-stage", "NETWORK_LEVEL_GREEN"))),
-        ),
+       ),
     ),
     UseCaseSpec(
         EventSeries.UC_2_2,
         "Selective reduction of energy consumption proportional to traffic",
+        "Proportional",
         (
             _event(EventSeries.UC_2_2, "U2-0", "TRAFFIC_PEAK",
                    "Peak traffic keeps the service path active at its planned capacity.",
@@ -234,6 +237,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_5,
         "Indirect Energy Monitoring and control",
+              "Indirect_meter",
         (
             _event(EventSeries.UC_2_5, "U5-0", "TARGET_UNINSTRUMENTED",
                    "The legacy target has no direct sensor, so its consumption remains unknown.",
@@ -251,11 +255,12 @@ UC_CATALOG = (
                    "The upstream outlet exposes a simulated power-control capability for the legacy target.",
                    profiles=("pdu-indirect",), power=((PDU_OUTLET_ID, 680),),
                    metadata=(("control-path", "pdu-outlet-1"), ("target-direct-measurement", "unknown"))),
-        ),
+       ),
     ),
     UseCaseSpec(
         EventSeries.UC_2_6,
         "Consideration of other domains for obtention of end-to-end metrics",
+              None,
         (
             _event(EventSeries.UC_2_6, "U6-0", "DOMAIN_METRICS_AVAILABLE",
                    "Access and transport domains report metrics for one end-to-end service.",
@@ -280,6 +285,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_7,
         "Dynamic adjustment of network element throughput in wireless transport",
+              None,
         (
             _event(EventSeries.UC_2_7, "U7-0", "PEAK_TRAFFIC_LINK_POWER",
                    "Peak traffic configures the wireless transport link for its planned capacity.",
@@ -302,6 +308,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_8,
         "Video streaming use case",
+              "Video streaming",
         (
             _event(EventSeries.UC_2_8, "U8-0", "HIGH_UNICAST_DEMAND",
                    "Separate unicast streams increase repeated traffic across the backbone.",
@@ -320,11 +327,12 @@ UC_CATALOG = (
                    "Local delivery reduces redundant backbone traffic while preserving the video service.",
                    power=((VIDEO_CACHE_ID, 450), (EDGE_ROUTER_ID, 540)),
                    metadata=(("backbone-traffic", "reduced"), ("service-continuity", "maintained"))),
-        ),
+       ),
     ),
     UseCaseSpec(
         EventSeries.UC_2_9,
         "WLAN Network Energy Saving",
+                       "WLAN",
         (
             _event(EventSeries.UC_2_9, "U9-0", "AP_ACTIVE",
                    "The PoE-powered access point serves both radio bands at full operation.",
@@ -359,6 +367,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_10,
         "Fixed Network Energy Saving",
+              None,
         (
             _event(EventSeries.UC_2_10, "U10-0", "TRAFFIC_HIGH",
                    "High traffic keeps the router line card active at the normal power baseline.",
@@ -381,6 +390,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_11,
         "Energy Efficiency Network Management",
+              None,
         (
             _event(EventSeries.UC_2_11, "U11-0", "INVENTORY_DISCOVERED",
                    "The management view discovers devices and their hardware-correlated energy objects.",
@@ -405,6 +415,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_12,
         "ISAC-enabled Energy-Aware Smart City Traffic Management",
+              "Smart-City",
         (
             _event(EventSeries.UC_2_12, "U12-0", "PEAK_HIGH_RESOLUTION_SENSING",
                    "High-resolution sensing supports detailed traffic awareness during peak conditions.",
@@ -429,11 +440,12 @@ UC_CATALOG = (
                    profiles=("isac",), power=((RADAR_SENSOR_ID, 650), (ROADSIDE_UNIT_ID, 1580)),
                    states=((RADAR_SENSOR_ID, ComponentState.LOW_POWER),),
                    metadata=(("critical-sensing", "active"), ("optional-sensing", "adaptive"))),
-        ),
+       ),
     ),
     UseCaseSpec(
         EventSeries.UC_2_13,
         "Double Accounting Open issue",
+              None,
         (
             _event(EventSeries.UC_2_13, "U13-0", "RAW_MEASUREMENTS",
                    "Measurements exist, but missing topology prevents reliable de-duplication.",
@@ -457,6 +469,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_14,
         "Energy Efficiency Under Power Shortage",
+              None,
         (
             _event(EventSeries.UC_2_14, "U14-0", "GRID_NORMAL",
                    "Normal grid power lets every component and service operate without energy restrictions.",
@@ -499,6 +512,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_15,
         "Energy-Efficient Management of Distributed AI Training Workloads",
+              None,
         (
             _event(EventSeries.UC_2_15, "U15-0", "TRAINING_FULL_CLUSTER",
                    "Active training nodes exchange East-West data across the cluster fabric.",
@@ -523,6 +537,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_16,
         "Network-level Cross Layer Energy Saving",
+              "Cross-Layer",
         (
             _event(EventSeries.UC_2_16, "U16-0", "MULTILAYER_NORMAL",
                    "IP overlay and transport underlay carry normal service traffic.",
@@ -551,7 +566,7 @@ UC_CATALOG = (
                    states=((LINECARD_1_ID, ComponentState.ACTIVE),
                            (TRANSPORT_MODULE_ID, ComponentState.ACTIVE)),
                    metadata=(("network-layers", "restored"), ("service-qos", "preserved"))),
-        ),
+         ),
     ),
 )
 
@@ -903,6 +918,7 @@ UC_CATALOG = tuple(
     UseCaseSpec(
         use_case.series,
         use_case.title,
+              use_case.nickname,
         use_case.events + _EVENT_EXPANSIONS[use_case.series],
     )
     for use_case in UC_CATALOG
