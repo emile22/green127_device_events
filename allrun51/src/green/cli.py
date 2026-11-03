@@ -1,4 +1,5 @@
 import argparse
+import sys
 import time
 from collections.abc import Callable, Sequence
 from pathlib import Path
@@ -238,6 +239,7 @@ def _display_event(
     previous: SimulatedEvent | None,
     visible_energy_object_ids: frozenset[str] | None = None,
 ) -> None:
+    use_color = output_fn is print and sys.stdout.isatty()
     for line in render_compact_event(
         event,
         topology.energy_objects,
@@ -245,6 +247,8 @@ def _display_event(
         result,
         visible_energy_object_ids,
     ).splitlines():
+        if use_color and line.startswith("["):
+            line = f"\x1b[32m{line}\x1b[0m"
         output_fn(line)
 
 
