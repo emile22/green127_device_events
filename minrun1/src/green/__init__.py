@@ -1,1 +1,0 @@
-"""Minimal GREEN energy-management runtime."""
