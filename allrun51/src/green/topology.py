@@ -17,7 +17,7 @@ ROUTER_A_ID = "eo-router-a"
 ROUTER_B_ID = "eo-router-b"
 LINECARD_1_ID = "eo-router-a-linecard-1"
 LINECARD_2_ID = "eo-router-a-linecard-2"
-NON_CRITICAL_PORT_ID = "eo-router-b-non-critical-port"
+NON_CRITICAL_PORT_ID = "eo-router-b-switchable-port"
 PDU_ID = "eo-pdu-1"
 PDU_OUTLET_ID = "eo-pdu-outlet-1"
 LEGACY_DEVICE_ID = "eo-legacy-device"
@@ -207,7 +207,7 @@ def demo_energy_objects() -> tuple[EnergyObject, ...]:
         EnergyObject(
             "router-B",
             NON_CRITICAL_PORT_ID,
-            "non-critical-port",
+            "switchable-port",
             "00000000-0000-4000-8000-000000000021",
             "router-B",
         ),

@@ -37,7 +37,7 @@
         "uuid": "00000000-0000-4000-8000-000000000020"
       },
       {
-        "name": "non-critical-port",
+        "name": "switchable-port",
         "class": "iana-hardware:energy-object",
         "uuid": "00000000-0000-4000-8000-000000000021"
       }

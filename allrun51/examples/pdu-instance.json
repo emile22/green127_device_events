@@ -60,8 +60,8 @@
         "source-component-id": "router-B"
       },
       {
-        "id": "eo-router-b-non-critical-port",
-        "source-component-id": "non-critical-port"
+        "id": "eo-router-b-switchable-port",
+        "source-component-id": "switchable-port"
       }
     ]
   }

@@ -1,5 +1,4 @@
 import argparse
-import os
 import time
 from collections.abc import Callable, Sequence
 from pathlib import Path
@@ -19,13 +18,10 @@ from green.views import (
     render_relationship_diff,
     render_relationships,
     render_summary,
-    render_network_map,
     filter_yang_instance_to_energy_objects,
 )
 
-_VIEW_COMMANDS = {"map", "summary", "relationships", "json", "xml", "diff"}
-_ANSI_BRIGHT_GREEN = "\033[92m"
-_ANSI_RESET = "\033[0m"
+_VIEW_COMMANDS = {"summary", "relationships", "json", "xml", "diff"}
 SUPPORTED_USE_CASE_IDS = tuple(
     sorted(
         {series.value.removeprefix("UC ") for series in EventSeries},
@@ -48,10 +44,6 @@ def parse_use_case(value: str) -> EventSeries:
     )
 
 
-def _color_output_enabled(output_fn: Callable[[str], None]) -> bool:
-    return output_fn is print and "NO_COLOR" not in os.environ
-
-
 def run_demo(
     simulator: EventSimulator,
     *,
@@ -71,22 +63,16 @@ def run_demo(
     current_event: SimulatedEvent | None = None
     previous_event: SimulatedEvent | None = None
     current_data: dict[str, object] | None = None
-    color_enabled = _color_output_enabled(output_fn)
-
-    def visible_ids_for_series(series: EventSeries) -> frozenset[str]:
-        scenario = simulator.network.scenarios_by_uc[series.value]
+    visible_energy_object_ids: frozenset[str] | None = None
+    if simulator.use_case is not None:
+        scenario = simulator.network.scenarios_by_uc[simulator.use_case.value]
         selected_topologies = set(scenario.topology_ids)
-        return frozenset(
+        visible_energy_object_ids = frozenset(
             energy_object_id
             for topology in simulator.network.topologies
             if topology.topology_id in selected_topologies
             for energy_object_id in topology.energy_object_ids
         )
-
-    first_spec = simulator.peek_next()
-    visible_energy_object_ids = (
-        visible_ids_for_series(first_spec.series) if first_spec is not None else frozenset()
-    )
     output_fn("GREEN allrun51 demo starting...")
 
     def disable_trace() -> None:
@@ -119,13 +105,7 @@ def run_demo(
         if current_event is None or current_data is None:
             output_fn(f"{command} view unavailable before the first event.")
             return
-        if command == "map":
-            output_fn(render_network_map(
-                simulator.network,
-                current_event.topology_ids,
-                current_event.relationships,
-            ))
-        elif command == "summary":
+        if command == "summary":
             output_fn(render_summary(
                 current_event,
                 current_data,
@@ -149,15 +129,10 @@ def run_demo(
         next_series = next_spec.series
     # Print a separator at each use-case boundary.
         if current_event is None or current_event.series != next_series:
-            heading = _use_case_heading(
-                next_series,
-                USE_CASES_BY_SERIES[next_series].title,
-                color_enabled,
-            )
-            output_fn(heading)
+            output_fn(f"--- {next_series.value} {USE_CASES_BY_SERIES[next_series].title} ---")
 
         if not auto:
-            output_fn("Enter next | a auto | d netconf | map / summary / relationships / json / xml / diff | r restart | q quit")
+            output_fn("Enter next | a auto | d netconf | summary / relationships / json / xml / diff | r restart | q quit")
             command = input_fn().strip().lower()
             if command == "a":
                 auto = True
@@ -176,9 +151,6 @@ def run_demo(
                         trace_path,
                         output_fn,
                         visible_energy_object_ids=visible_energy_object_ids,
-                        interval_energy_measurements=(
-                            current_event.measurements if current_event is not None else ()
-                        ),
                     )
                     trace_tailer.start()
                     output_fn(f"NETCONF trace enabled (live view): {trace_path}")
@@ -203,16 +175,12 @@ def run_demo(
                 show_view(command)
                 continue
             if command:
-                output_fn("Unknown command. Choose ENTER, a, d, map, summary, relationships, json, xml, diff, r, or q.")
+                output_fn("Unknown command. Choose ENTER, a, d, summary, relationships, json, xml, diff, r, or q.")
                 continue
 
         event = simulator.next_event()
         if event is None:
             break
-        visible_energy_object_ids = visible_ids_for_series(event.series)
-        if trace_tailer is not None:
-            trace_tailer.visible_energy_object_ids = visible_energy_object_ids
-            trace_tailer.interval_energy_measurements = event.measurements
         if snapshot_fn is not None:
             try:
                 snapshot_fn(event)
@@ -221,7 +189,7 @@ def run_demo(
 
         topology, boundary = build_demo_topology(relationships=event.relationships)
         result = None
-        if event.series in (EventSeries.UC_2_13, EventSeries.UC_2_10):
+        if event.series is EventSeries.UC_2_13:
             result = accounting.compute(
                 boundary,
                 event.measurements,
@@ -231,7 +199,8 @@ def run_demo(
                 event_name=event.name,
             )
         data = event_to_yang(event, simulator.energy_objects)
-        data = filter_yang_instance_to_energy_objects(data, visible_energy_object_ids)
+        if visible_energy_object_ids is not None:
+            data = filter_yang_instance_to_energy_objects(data, visible_energy_object_ids)
         prior_event = current_event
         previous_event, current_event = current_event, event
         current_data = data
@@ -242,7 +211,6 @@ def run_demo(
             output_fn,
             prior_event,
             visible_energy_object_ids,
-            color_enabled=color_enabled,
         )
 
         next_spec = simulator.peek_next()
@@ -269,30 +237,15 @@ def _display_event(
     output_fn: Callable[[str], None],
     previous: SimulatedEvent | None,
     visible_energy_object_ids: frozenset[str] | None = None,
-    color_enabled: bool = False,
 ) -> None:
-    lines = render_compact_event(
+    for line in render_compact_event(
         event,
         topology.energy_objects,
         previous,
         result,
         visible_energy_object_ids,
-    ).splitlines()
-    if (
-        color_enabled
-        and event.series is EventSeries.UC_2_10
-        and lines
-    ):
-        lines[0] = f"{_ANSI_BRIGHT_GREEN}{lines[0]}{_ANSI_RESET}"
-    for line in lines:
+    ).splitlines():
         output_fn(line)
-
-
-def _use_case_heading(series: EventSeries, title: str, color_enabled: bool) -> str:
-    heading = f"--- {series.value} {title} ---"
-    if color_enabled and series is EventSeries.UC_2_10:
-        return f"{_ANSI_BRIGHT_GREEN}{heading}{_ANSI_RESET}"
-    return heading
 
 
 def main(

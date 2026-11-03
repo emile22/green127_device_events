@@ -90,13 +90,16 @@ def test_u13_3_missing_one_metering_path_has_no_accounted_total() -> None:
     assert result.raw_measurements == event.measurements
 
 
-def test_u10_events_are_accounted_from_interval_values() -> None:
+def test_u10_events_are_not_server_meter_accounting_events() -> None:
     events = events_by_sequence()
-    results = [account_event(events[f"U10-{index}"]) for index in range(4)]
+    fixed_network_events = [events[f"U10-{index}"] for index in range(8)]
 
-    assert [result.accounted_total_wh for result in results] == [300, 150, 80, 360]
-    assert [result.naive_total_wh for result in results] == [600, 300, 160, 720]
-    assert all(result.topology_status is TopologyStatus.COMPLETE for result in results)
+    assert all(not event.measurements for event in fixed_network_events)
+    assert all(
+        {item.energy_object_id for item in event.power_measurements}
+        == {"eo-router-a", "eo-router-b"}
+        for event in fixed_network_events
+    )
 
 
 def test_metered_by_relationships_traverse_from_meter_to_metered_object() -> None:

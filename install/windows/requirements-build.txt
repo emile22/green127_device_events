@@ -1,0 +1,3 @@
+# The project is exposed through PYTHONPATH rather than installed editable.
+# setuptools is included only for optional local build metadata checks.
+setuptools==65.5.0

@@ -45,6 +45,10 @@ The workspace selects `minrun3/.venv/Scripts/python.exe` on Windows. The
 runtime adapter uses the standard library. `pyang` is a development/test
 dependency and is not required to start the runtime.
 
+`run.py` reports that WSL NETCONF is not configured for minrun3. This project
+does not start Sysrepo/Netopeer2 or report their process IDs because it stops
+before NETCONF integration.
+
 ## Interactive Runtime
 
 Run the existing test-first launcher:
@@ -69,6 +73,9 @@ continues across the UC 2.13/UC 2.10 series boundary. The CLI interval controls
 real-time pauses between displayed events only; it is not the measurement
 interval. Each simulated measurement represents a distinct one-hour interval.
 Use `--interval 0` to disable runtime delays.
+
+The test-first launcher accepts the same flags, for example
+`python run.py --auto --interval 0`.
 
 ## Accounting Model
 

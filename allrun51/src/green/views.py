@@ -5,9 +5,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
-from green.canonical_network import CanonicalNetwork
 from green.catalog import USE_CASES_BY_SERIES
-from green.models import AccountingResult, EnergyObject, EnergyRelationship, SimulatedEvent
+from green.models import AccountingResult, EnergyObject, SimulatedEvent
 from green.netconf_trace import (
     _energy_object_inventory,
     _hardware_inventory,
@@ -94,10 +93,7 @@ def render_summary(
         "ietf-power-and-energy:energy-objects": {"energy-object": selected_objects},
     }
     hardware_rows = _hardware_inventory(summary_data) or ["HARDWARE INVENTORY", "(no related hardware)"]
-    energy_rows = _energy_object_inventory(
-        summary_data,
-        interval_energy_measurements=event.measurements,
-    ) or ["GREEN ENERGY OBJECTS", "(no related Energy Objects)"]
+    energy_rows = _energy_object_inventory(summary_data) or ["GREEN ENERGY OBJECTS", "(no related Energy Objects)"]
     sections = [
         "1. HARDWARE INVENTORY",
         *hardware_rows[1:],
@@ -112,50 +108,6 @@ def render_summary(
         render_interpretation(event),
     ]
     return "\n".join(sections)
-
-
-def render_network_map(
-    network: CanonicalNetwork,
-    topology_ids: tuple[str, ...],
-    relationships: tuple[EnergyRelationship, ...],
-) -> str:
-    selected_topologies = [
-        topology
-        for topology in network.topologies
-        if topology.topology_id in topology_ids
-    ]
-    topology_memberships: dict[str, int] = {}
-    for topology in selected_topologies:
-        for device_id in topology.device_ids:
-            topology_memberships[device_id] = topology_memberships.get(device_id, 0) + 1
-
-    devices_by_id = network.devices_by_id
-    archetypes_by_id = network.archetypes_by_id
-    objects_by_id = {item.energy_object_id: item for item in network.energy_objects}
-    lines = ["NETWORK MAP", f"Network: {network.network_id}"]
-    for topology in selected_topologies:
-        lines.extend(["", f"{topology.topology_id} | {topology.name}"])
-        for device_id in topology.device_ids:
-            device = devices_by_id[device_id]
-            archetype = archetypes_by_id[device.archetype_id]
-            shared = " [shared]" if topology_memberships[device_id] > 1 else ""
-            lines.append(f"  {device.name} ({device.device_id}) | {archetype.name}{shared}")
-            for object_id in topology.energy_object_ids:
-                energy_object = objects_by_id[object_id]
-                if energy_object.device_id == device_id:
-                    component_name = energy_object.hardware_component_name or "unmapped"
-                    lines.append(f"    {object_id} [{component_name}]")
-
-    lines.extend(["", "GREEN Energy Object relationships (event-visible):"])
-    if relationships:
-        lines.extend(
-            f"  {item.source_energy_object_id} --{item.relationship_type.value}--> "
-            f"{item.peer_energy_object_id}"
-            for item in relationships
-        )
-    else:
-        lines.append("  (none)")
-    return "\n".join(lines)
 
 
 def render_compact_event(

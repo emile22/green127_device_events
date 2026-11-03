@@ -2,22 +2,14 @@ import json
 import os
 import shutil
 import threading
-from collections.abc import Callable, Sequence
-from decimal import Decimal
+from collections.abc import Callable
 from pathlib import Path
 from textwrap import wrap
-
-from green.models import RawEnergyMeasurement
 
 from green.energy_observability import build_observability_registry
 
 
 _TRACE_WIDTH = 72
-
-
-def _watts_from_milliwatts(value: object) -> str:
-    watts = Decimal(str(value)) / Decimal(1000)
-    return format(watts.normalize(), "f")
 
 
 def _wrap_line(text: str, width: int = _TRACE_WIDTH) -> list[str]:
@@ -137,7 +129,6 @@ def filter_yang_instance_to_energy_objects(
 def _energy_object_inventory(
     data: object,
     terminal_width: int | None = None,
-    interval_energy_measurements: Sequence[RawEnergyMeasurement] = (),
 ) -> list[str] | None:
     if not isinstance(data, dict):
         return None
@@ -151,14 +142,7 @@ def _energy_object_inventory(
     if terminal_width is None:
         terminal_width = shutil.get_terminal_size((80, 24)).columns
     compact = terminal_width < _TRACE_WIDTH
-    column_widths = (18, 15, 7, 8, 9, 14)
-    average_power_w = {
-        measurement.energy_object_id: (
-            measurement.interval_energy_wh * 3600 / measurement.interval_duration_seconds
-        )
-        for measurement in interval_energy_measurements
-        if measurement.interval_duration_seconds > 0
-    }
+    column_widths = (20, 17, 7, 9, 14)
 
     def table_row(cells: list[str]) -> list[str]:
         wrapped_cells = [
@@ -182,9 +166,7 @@ def _energy_object_inventory(
 
     rows = ["GREEN ENERGY OBJECTS"]
     if not compact:
-        rows.extend(table_row([
-            "Energy Object", "Source component", "Power W", "Avg W", "State", "Relationships"
-        ]))
+        rows.extend(table_row(["Energy Object", "Source component", "Power", "State", "Relationships"]))
         rows.append("-" * _TRACE_WIDTH)
     observability = build_observability_registry()
     for item in objects:
@@ -195,10 +177,7 @@ def _energy_object_inventory(
         profile = observability.get(object_id)
         power_data = item.get("power")
         power_value = power_data.get("instantaneous-power") if isinstance(power_data, dict) else None
-        power_w = _watts_from_milliwatts(power_value) if power_value is not None else None
-        power = profile.display_power(power_w) if profile else "UNKNOWN"
-        average_power = average_power_w.get(object_id)
-        average_power_text = f"{average_power:g}" if average_power is not None else "-"
+        power = profile.display_power(power_value) if profile else "UNKNOWN"
         state_data = item.get("power-state")
         state = state_data.get("oper") if isinstance(state_data, dict) else None
         state = str(state).rsplit(":", 1)[-1] if state is not None else None
@@ -222,22 +201,16 @@ def _energy_object_inventory(
         )
         if compact:
             rows.extend(_wrap_line(f"{object_id} [{hardware_name}]", terminal_width))
-            rows.extend(_wrap_line(
-                f"  Power: {power} | Avg W: {average_power_text} | State: {state}",
-                terminal_width,
-            ))
+            rows.extend(_wrap_line(f"  Power: {power} | State: {state}", terminal_width))
             rows.extend(_wrap_line(f"  Relationships: {relationship_text}", terminal_width))
         else:
-            rows.extend(table_row([
-                object_id, hardware_name, power, average_power_text, state, relationship_text
-            ]))
+            rows.extend(table_row([object_id, hardware_name, power, state, relationship_text]))
     return rows
 
 
 def format_netconf_trace_entry(
     entry: str,
     visible_energy_object_ids: set[str] | frozenset[str] | None = None,
-    interval_energy_measurements: Sequence[RawEnergyMeasurement] = (),
 ) -> str:
     lines = entry.splitlines()
     header = next(
@@ -264,10 +237,7 @@ def format_netconf_trace_entry(
         data = filter_yang_instance_to_energy_objects(data, visible_energy_object_ids)
         formatted_payload = json.dumps(data, indent=2, ensure_ascii=False)
     inventory = _hardware_inventory(data)
-    energy_inventory = _energy_object_inventory(
-        data,
-        interval_energy_measurements=interval_energy_measurements,
-    )
+    energy_inventory = _energy_object_inventory(data)
 
     operation = fields.get("operation", record_type)
     status = fields.get("status", "unknown").upper()
@@ -306,13 +276,11 @@ class NetconfTraceTailer:
         poll_interval: float = 0.1,
         *,
         visible_energy_object_ids: set[str] | frozenset[str] | None = None,
-        interval_energy_measurements: Sequence[RawEnergyMeasurement] = (),
     ) -> None:
         self.trace_path = trace_path
         self.output_fn = output_fn
         self.poll_interval = poll_interval
         self.visible_energy_object_ids = visible_energy_object_ids
-        self.interval_energy_measurements = tuple(interval_energy_measurements)
         self._stop_event = threading.Event()
         self._thread: threading.Thread | None = None
         try:
@@ -357,11 +325,7 @@ class NetconfTraceTailer:
                 return
         pending, _ = self._read_entries(stream, pending, offset)
         if pending.strip():
-            self.output_fn(format_netconf_trace_entry(
-                pending,
-                self.visible_energy_object_ids,
-                self.interval_energy_measurements,
-            ))
+            self.output_fn(format_netconf_trace_entry(pending, self.visible_energy_object_ids))
         stream.close()
 
     def _read_entries(self, stream, pending: str, offset: int) -> tuple[str, int]:
@@ -371,9 +335,5 @@ class NetconfTraceTailer:
         while "\n\n" in pending:
             entry, pending = pending.split("\n\n", 1)
             if entry.strip():
-                self.output_fn(format_netconf_trace_entry(
-                    entry,
-                    self.visible_energy_object_ids,
-                    self.interval_energy_measurements,
-                ))
+                self.output_fn(format_netconf_trace_entry(entry, self.visible_energy_object_ids))
         return pending, offset

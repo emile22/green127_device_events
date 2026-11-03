@@ -5,10 +5,7 @@ from types import SimpleNamespace
 import pytest
 
 from green.__main__ import main, run_demo
-from green.cli import _display_event, _use_case_heading
-from green.models import EventSeries
-from green.simulator import EventSimulator, generate_events
-from green.topology import build_demo_topology
+from green.simulator import EventSimulator
 import run
 
 
@@ -41,87 +38,6 @@ def test_enter_advances_exactly_one_group_a_event() -> None:
     assert any(line.startswith("DIFF   ") for line in output)
     assert not any(len(line) >= 79 and set(line) == {"-"} for line in output)
     assert sleep_calls == []
-
-
-def test_fixed_network_events_are_colored_only_when_enabled() -> None:
-    events = generate_events()
-    fixed_network_events = [
-        event for event in events if event.series is EventSeries.UC_2_10
-    ]
-    assert [event.sequence for event in fixed_network_events] == [
-        f"U10-{index}" for index in range(8)
-    ]
-    for event in fixed_network_events:
-        topology, _ = build_demo_topology(relationships=event.relationships)
-        output: list[str] = []
-
-        _display_event(event, None, topology, output.append, None, color_enabled=True)
-
-        assert output[0] == (
-            f"\033[92m[UC 2.10 / {event.sequence}] {event.name}\033[0m"
-        )
-        assert not any("\033[92m" in line for line in output[1:])
-
-    other_event = next(event for event in events if event.sequence == "U11-0")
-    other_topology, _ = build_demo_topology(relationships=other_event.relationships)
-    other_output: list[str] = []
-    _display_event(
-        other_event,
-        None,
-        other_topology,
-        other_output.append,
-        None,
-        color_enabled=True,
-    )
-    assert other_output[0] == "[UC 2.11 / U11-0] INVENTORY_DISCOVERED"
-
-
-def test_fixed_network_energy_saving_title_is_colored_only_when_enabled() -> None:
-    colored = _use_case_heading(
-        EventSeries.UC_2_10,
-        "Fixed Network Energy Saving",
-        True,
-    )
-    plain_other_uc = _use_case_heading(
-        EventSeries.UC_2_9,
-        "WLAN Network Energy Saving",
-        True,
-    )
-    plain_disabled = _use_case_heading(
-        EventSeries.UC_2_10,
-        "Fixed Network Energy Saving",
-        False,
-    )
-
-    assert colored == "\033[92m--- UC 2.10 Fixed Network Energy Saving ---\033[0m"
-    assert plain_other_uc == "--- UC 2.9 WLAN Network Energy Saving ---"
-    assert plain_disabled == "--- UC 2.10 Fixed Network Energy Saving ---"
-
-
-def test_default_print_keeps_color_when_stdout_is_not_a_tty(monkeypatch) -> None:
-    from green import cli
-
-    monkeypatch.delenv("NO_COLOR", raising=False)
-    assert cli._color_output_enabled(print)
-    assert not cli._color_output_enabled(list.append)
-
-    monkeypatch.setenv("NO_COLOR", "")
-    assert not cli._color_output_enabled(print)
-
-
-def test_fixed_network_colors_are_preserved_with_captured_stdout(monkeypatch, capsys) -> None:
-    monkeypatch.delenv("NO_COLOR", raising=False)
-    main(
-        ["-u", "2.10", "--auto", "--interval", "0"],
-        sleep_fn=lambda _: None,
-        snapshot_fn=None,
-        trace_fn=lambda _: Path("trace.log"),
-    )
-
-    output = capsys.readouterr().out
-    assert "\033[92m--- UC 2.10 Fixed Network Energy Saving ---\033[0m" in output
-    assert "\033[92m[UC 2.10 / U10-1] TRAFFIC_LOW\033[0m" in output
-    assert "\033[92m[UC 2.10 / U10-2] COMPONENT_SLEEP\033[0m" in output
 
 
 def test_a_runs_remaining_events_across_all_uc_boundaries() -> None:
@@ -189,35 +105,8 @@ def test_human_and_raw_views_do_not_advance_the_event() -> None:
     assert any("1. HARDWARE INVENTORY" in line for line in output)
     assert any("3. ENERGY RELATIONSHIPS" in line for line in output)
     assert any('"ietf-power-and-energy:energy-objects"' in line for line in output)
-    json_view = next(line for line in output if '"ietf-power-and-energy:energy-objects"' in line)
-    assert '"eo-ap-1"' not in json_view
-    assert '"name": "ap-1"' not in json_view
     assert "<rpc-reply><data/></rpc-reply>" in output
     assert any("No previous event" in line for line in output)
-
-
-def test_map_view_shows_selected_uc_topologies_and_relationships() -> None:
-    commands = iter(["", "map", "q"])
-    output: list[str] = []
-    run_demo(
-        EventSimulator(use_case=EventSeries.UC_2_10),
-        auto=False,
-        interval=0,
-        input_fn=lambda: next(commands),
-        sleep_fn=lambda _: None,
-        output_fn=output.append,
-        snapshot_fn=None,
-    )
-
-    assert event_lines(output) == ["[UC 2.10 / U10-0] TRAFFIC_HIGH"]
-    network_map = next(line for line in output if line.startswith("NETWORK MAP\n"))
-    assert "T1-fixed-network | Fixed network" in network_map
-    assert "T3-power-infrastructure | Power infrastructure" in network_map
-    assert "Router A (router-A)" in network_map
-    assert "Router A (router-A) | Fixed-network router [shared]" in network_map
-    assert "PDU and metering system (pdu-1)" in network_map
-    assert "eo-upstream-meter --metering--> eo-server-a" in network_map
-    assert "wlan-1" not in network_map
 
 
 def test_auto_main_runs_every_event_and_writes_every_snapshot() -> None:
@@ -334,53 +223,11 @@ def test_launcher_defaults_to_interactive_runtime(monkeypatch) -> None:
     monkeypatch.setattr(run, "pause_for_review", lambda *_args: None)
 
     assert run.main([]) == 0
-    assert commands[0] == [
-        "project-python", "-m", "pytest", "-v", "--durations=0"
-    ]
+    assert commands[0] == ["project-python", "-m", "pytest", "-v"]
     assert commands[1] == ["project-python", "-m", "green"]
     project_dir = Path(run.__file__).resolve().parent
     assert working_directories[:2] == [project_dir, project_dir]
     assert runtime_pythonpaths[0].split(run.os.pathsep)[0] == run.project_source
-
-
-def test_pytest_report_parser_uses_test_results_and_durations() -> None:
-    stdout = """tests/test_netconf.py::test_get_capabilities PASSED [ 50%]
-tests/test_netconf.py::test_verify_state FAILED [100%]
-============================= slowest 10 durations =============================
-0.04s call tests/test_netconf.py::test_get_capabilities
-0.06s call tests/test_netconf.py::test_verify_state
-"""
-
-    rows, counts = run._parse_pytest_results(stdout, "", 1, 0.12)
-
-    assert rows == [
-        ("tests/test_netconf.py::test_get_capabilities", "PASSED", 40.0),
-        ("tests/test_netconf.py::test_verify_state", "FAILED", 60.0),
-    ]
-    assert counts == {"passed": 1, "failed": 1, "skipped": 0}
-
-
-def test_rich_test_report_renders_table_and_summary(capsys) -> None:
-    run._display_test_results(
-        "tests/test_netconf.py::test_get_capabilities PASSED [ 50%]\n"
-        "tests/test_netconf.py::test_verify_state FAILED [100%]\n"
-        "0.04s call tests/test_netconf.py::test_get_capabilities\n"
-        "0.06s call tests/test_netconf.py::test_verify_state\n",
-        "",
-        1,
-        0.12,
-    )
-
-    output = capsys.readouterr().out
-    assert "GREEN Test Suite" in output
-    assert "test_get_capabilities" in output and "PASS" in output
-    assert "test_verify_state" in output and "FAIL" in output
-    assert "40" in output and "60" in output
-    if run._console is None:
-        assert "Total tests: 2 | Passed: 1 | Failed: 1" in output
-    else:
-        assert "SUMMARY" in output
-        assert "Total tests : 2" in output
 
 
 def test_launcher_auto_mode_can_run_without_delay(monkeypatch) -> None:

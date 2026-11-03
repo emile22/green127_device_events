@@ -1,17 +1,12 @@
 import json
 import os
 import socket
-import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
 from green.catalog import USE_CASES_BY_SERIES
 from green.models import AccountingResult, EnergyObject, SimulatedEvent
-from green.netconf_trace import (
-    _energy_object_inventory,
-    _hardware_inventory,
-    filter_yang_instance_to_energy_objects,
-)
+from green.netconf_trace import _energy_object_inventory, _hardware_inventory
 from green.yang_adapter import to_yang_instance
 
 
@@ -25,11 +20,7 @@ def event_to_yang(event: SimulatedEvent, energy_objects: tuple[EnergyObject, ...
     )
 
 
-def render_summary(
-    event: SimulatedEvent,
-    data: dict[str, object],
-    visible_energy_object_ids: set[str] | frozenset[str] | None = None,
-) -> str:
+def render_summary(event: SimulatedEvent, data: dict[str, object]) -> str:
     energy_root = data.get("ietf-power-and-energy:energy-objects", {})
     all_objects = energy_root.get("energy-object", []) if isinstance(energy_root, dict) else []
     objects_by_id = {
@@ -59,8 +50,6 @@ def render_summary(
         for value_part in value.split(","):
             if value_part in component_to_object:
                 selected_ids.add(component_to_object[value_part])
-    if visible_energy_object_ids is not None:
-        selected_ids = set(visible_energy_object_ids)
 
     selected_objects = [
         item for object_id, item in objects_by_id.items() if object_id in selected_ids
@@ -115,7 +104,6 @@ def render_compact_event(
     energy_objects: tuple[EnergyObject, ...],
     previous: SimulatedEvent | None,
     accounting: AccountingResult | None = None,
-    visible_energy_object_ids: set[str] | frozenset[str] | None = None,
 ) -> str:
     objects_by_id = {item.energy_object_id: item for item in energy_objects}
     states = dict(event.component_states)
@@ -134,8 +122,6 @@ def render_compact_event(
             for object_id in previous_states.keys() | states.keys()
             if previous_states.get(object_id) != states.get(object_id)
         )
-    if visible_energy_object_ids is not None:
-        related_ids.intersection_update(visible_energy_object_ids)
 
     def component_name(object_id: str) -> str:
         item = objects_by_id.get(object_id)
@@ -148,8 +134,6 @@ def render_compact_event(
     ]
     energy = []
     for measurement in event.measurements:
-        if visible_energy_object_ids is not None and measurement.energy_object_id not in visible_energy_object_ids:
-            continue
         label = f"{measurement.energy_object_id}[{component_name(measurement.energy_object_id)}]"
         value = f"{measurement.interval_energy_wh}Wh"
         if measurement.cumulative_energy_wh is not None:
@@ -159,8 +143,6 @@ def render_compact_event(
             value += f"/{state.value}"
         energy.append(f"{label}={value}")
     for measurement in event.power_measurements:
-        if visible_energy_object_ids is not None and measurement.energy_object_id not in visible_energy_object_ids:
-            continue
         label = f"{measurement.energy_object_id}[{component_name(measurement.energy_object_id)}]"
         state = states.get(measurement.energy_object_id)
         value = f"{measurement.instantaneous_power_w}W/{state.value}" if state else f"{measurement.instantaneous_power_w}W"
@@ -168,11 +150,6 @@ def render_compact_event(
 
     grouped_relationships: dict[tuple[str, str], set[str]] = {}
     for relationship in event.relationships:
-        if visible_energy_object_ids is not None and (
-            relationship.source_energy_object_id not in visible_energy_object_ids
-            or relationship.peer_energy_object_id not in visible_energy_object_ids
-        ):
-            continue
         key = (relationship.source_energy_object_id, relationship.relationship_type.value.upper())
         grouped_relationships.setdefault(key, set()).add(relationship.peer_energy_object_id)
     relationship_line = "; ".join(
@@ -186,42 +163,28 @@ def render_compact_event(
     else:
         previous_states = dict(previous.component_states)
         for object_id in sorted(previous_states.keys() | states.keys()):
-            if visible_energy_object_ids is not None and object_id not in visible_energy_object_ids:
-                continue
             before, after = previous_states.get(object_id), states.get(object_id)
             if before != after:
                 changes.append(f"{component_name(object_id)}:{before.value if before else '-'}->{after.value if after else '-'}")
         previous_power = {item.energy_object_id: item.instantaneous_power_w for item in previous.power_measurements}
         current_power = {item.energy_object_id: item.instantaneous_power_w for item in event.power_measurements}
         for object_id in sorted(previous_power.keys() | current_power.keys()):
-            if visible_energy_object_ids is not None and object_id not in visible_energy_object_ids:
-                continue
             before, after = previous_power.get(object_id), current_power.get(object_id)
             if before != after:
                 changes.append(f"{object_id}:{before if before is not None else '-'}->{after if after is not None else '-'}W")
         previous_energy = {item.energy_object_id: item.interval_energy_wh for item in previous.measurements}
         current_energy = {item.energy_object_id: item.interval_energy_wh for item in event.measurements}
         for object_id in sorted(previous_energy.keys() | current_energy.keys()):
-            if visible_energy_object_ids is not None and object_id not in visible_energy_object_ids:
-                continue
             before, after = previous_energy.get(object_id), current_energy.get(object_id)
             if before != after:
                 changes.append(f"{object_id}:{before if before is not None else '-'}->{after if after is not None else '-'}Wh")
         previous_relationships = {
             (item.source_energy_object_id, item.relationship_type.value.upper(), item.peer_energy_object_id)
             for item in previous.relationships
-            if visible_energy_object_ids is None or (
-                item.source_energy_object_id in visible_energy_object_ids
-                and item.peer_energy_object_id in visible_energy_object_ids
-            )
         }
         current_relationships = {
             (item.source_energy_object_id, item.relationship_type.value.upper(), item.peer_energy_object_id)
             for item in event.relationships
-            if visible_energy_object_ids is None or (
-                item.source_energy_object_id in visible_energy_object_ids
-                and item.peer_energy_object_id in visible_energy_object_ids
-            )
         }
         changes.extend(
             f"+{source} {kind}->{peer}" for source, kind, peer in sorted(current_relationships - previous_relationships)
@@ -289,7 +252,6 @@ def render_json(data: dict[str, object]) -> str:
 def render_relationship_diff(
     previous: SimulatedEvent | None,
     current: SimulatedEvent,
-    visible_energy_object_ids: set[str] | frozenset[str] | None = None,
 ) -> str:
     if previous is None:
         return "No previous event is available for comparison."
@@ -302,10 +264,6 @@ def render_relationship_diff(
                 relationship.peer_energy_object_id,
             )
             for relationship in event.relationships
-            if visible_energy_object_ids is None or (
-                relationship.source_energy_object_id in visible_energy_object_ids
-                and relationship.peer_energy_object_id in visible_energy_object_ids
-            )
         }
 
     before = relations(previous)
@@ -327,7 +285,6 @@ def render_relationship_diff(
     state_changes = [
         (object_id, previous_states.get(object_id), current_states.get(object_id))
         for object_id in sorted(previous_states.keys() | current_states.keys())
-        if visible_energy_object_ids is None or object_id in visible_energy_object_ids
         if previous_states.get(object_id) != current_states.get(object_id)
     ]
     if state_changes:
@@ -339,70 +296,7 @@ def render_relationship_diff(
     return "\n".join(lines)
 
 
-def filter_netconf_xml_to_energy_objects(
-    xml: str,
-    visible_energy_object_ids: set[str] | frozenset[str],
-) -> str:
-    netconf_ns = "urn:ietf:params:xml:ns:netconf:base:1.0"
-    hardware_ns = "urn:ietf:params:xml:ns:yang:ietf-hardware"
-    energy_ns = "urn:ietf:params:xml:ns:yang:ietf-power-and-energy"
-    root = ET.fromstring(xml)
-    data = root.find(f".//{{{netconf_ns}}}data")
-    if data is None and root.tag == f"{{{netconf_ns}}}data":
-        data = root
-    if data is None:
-        return xml
-
-    energy_objects = data.find(f"{{{energy_ns}}}energy-objects")
-    hardware = data.find(f"{{{hardware_ns}}}hardware")
-    if energy_objects is None or hardware is None:
-        return xml
-
-    selected_component_names: set[str] = set()
-    for energy_object in list(energy_objects.findall(f"{{{energy_ns}}}energy-object")):
-        object_id = energy_object.findtext(f"{{{energy_ns}}}id")
-        if object_id not in visible_energy_object_ids:
-            energy_objects.remove(energy_object)
-            continue
-
-        component_name = energy_object.findtext(f"{{{energy_ns}}}source-component-id")
-        if component_name:
-            selected_component_names.add(component_name)
-
-        for relationship in list(energy_object.findall(f"{{{energy_ns}}}relationship")):
-            for peer in list(relationship.findall(f"{{{energy_ns}}}peer")):
-                peer_id = peer.findtext(f"{{{energy_ns}}}id")
-                if peer_id not in visible_energy_object_ids:
-                    relationship.remove(peer)
-            if not relationship.findall(f"{{{energy_ns}}}peer"):
-                energy_object.remove(relationship)
-
-    components = hardware.findall(f"{{{hardware_ns}}}component")
-    components_by_name = {
-        component.findtext(f"{{{hardware_ns}}}name"): component
-        for component in components
-        if component.findtext(f"{{{hardware_ns}}}name")
-    }
-    pending = list(selected_component_names)
-    while pending:
-        component = components_by_name.get(pending.pop())
-        if component is None:
-            continue
-        parent = component.findtext(f"{{{hardware_ns}}}parent")
-        if parent and parent not in selected_component_names:
-            selected_component_names.add(parent)
-            pending.append(parent)
-
-    for component in list(components):
-        component_name = component.findtext(f"{{{hardware_ns}}}name")
-        if component_name not in selected_component_names:
-            hardware.remove(component)
-    return ET.tostring(root, encoding="unicode")
-
-
-def fetch_netconf_xml(
-    visible_energy_object_ids: set[str] | frozenset[str] | None = None,
-) -> str:
+def fetch_netconf_xml() -> str:
     config_path = Path(__file__).resolve().parents[2] / "runtime" / "netconf" / "connection.env"
     config: dict[str, str] = {}
     if config_path.is_file():
@@ -447,8 +341,6 @@ def fetch_netconf_xml(
     )
     try:
         reply = session.get()
-        if visible_energy_object_ids is None:
-            return reply.xml
-        return filter_netconf_xml_to_energy_objects(reply.xml, visible_energy_object_ids)
+        return reply.xml
     finally:
         session.close_session()

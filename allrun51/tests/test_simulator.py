@@ -91,13 +91,19 @@ def test_existing_uc213_measurements_and_topology_progression_are_preserved() ->
     assert dict(events[0].metadata)["relationship-change"] == "topology-not-discovered"
 
 
-def test_existing_uc210_intervals_cumulative_values_and_states_are_preserved() -> None:
+def test_uc210_router_power_and_linecard_states_are_preserved() -> None:
     events = [events_by_sequence()[f"U10-{index}"] for index in range(4)]
-    assert values_by_object(events, "interval_energy_wh", UPSTREAM_METER_ID) == [300, 150, 80, 360]
-    assert values_by_object(events, "cumulative_energy_wh", UPSTREAM_METER_ID) == [300, 450, 530, 890]
-    assert values_by_object(events, "cumulative_energy_wh", SERVER_A_ID) == [120, 180, 240, 390]
-    assert values_by_object(events, "cumulative_energy_wh", SERVER_B_ID) == [180, 270, 290, 500]
-    assert [dict(event.component_states)[SERVER_B_ID] for event in events] == [
+    assert all(not event.measurements for event in events)
+    assert [
+        {item.energy_object_id: item.instantaneous_power_w for item in event.power_measurements}
+        for event in events
+    ] == [
+        {ROUTER_A_ID: 500, ROUTER_B_ID: 480},
+        {ROUTER_A_ID: 340, ROUTER_B_ID: 330},
+        {ROUTER_A_ID: 220, ROUTER_B_ID: 390},
+        {ROUTER_A_ID: 460, ROUTER_B_ID: 470},
+    ]
+    assert [dict(event.component_states)[LINECARD_1_ID] for event in events] == [
         ComponentState.ACTIVE,
         ComponentState.ACTIVE,
         ComponentState.LOW_POWER,
@@ -151,7 +157,7 @@ def test_all_relationship_peers_are_known_and_relationships_are_unique() -> None
     )
 
 
-def test_reset_restarts_first_event_and_uc210_cumulative_counter() -> None:
+def test_reset_restarts_first_event_and_uc210_power_observation() -> None:
     simulator = EventSimulator()
     events = []
     while (event := simulator.next_event()) is not None:
@@ -165,4 +171,8 @@ def test_reset_restarts_first_event_and_uc210_cumulative_counter() -> None:
             restarted = event
             break
     assert restarted is not None
-    assert values_by_object((restarted,), "cumulative_energy_wh", UPSTREAM_METER_ID) == [300]
+    assert restarted.measurements == ()
+    assert {
+        item.energy_object_id: item.instantaneous_power_w
+        for item in restarted.power_measurements
+    } == {ROUTER_A_ID: 500, ROUTER_B_ID: 480}

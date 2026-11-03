@@ -5,13 +5,13 @@ Classes describe evidence in the deterministic event catalog, not new YANG leave
 | Energy Object                     | Class           | Power | State | Energy | Relationships |
 | --------------------------------- | --------------- | ----- | ----- | ------ | ------------- |
 | `eo-upstream-meter`               | `TOPOLOGY_ONLY` | no    | no    | yes    | yes           |
-| `eo-server-a`                     | `STATE_ONLY`    | no    | yes   | yes    | yes           |
-| `eo-server-b`                     | `STATE_ONLY`    | no    | yes   | yes    | yes           |
+| `eo-server-a`                     | `TOPOLOGY_ONLY` | no    | no    | yes    | yes           |
+| `eo-server-b`                     | `TOPOLOGY_ONLY` | no    | no    | yes    | yes           |
 | `eo-router-a`                     | `FULL`          | yes   | yes   | no     | yes           |
 | `eo-router-a-linecard-1`          | `FULL`          | yes   | yes   | no     | yes           |
 | `eo-router-a-linecard-2`          | `UNOBSERVED`    | no    | no    | no     | no            |
 | `eo-router-b`                     | `FULL`          | yes   | yes   | no     | yes           |
-| `eo-router-b-non-critical-port`   | `STATE_ONLY`    | no    | yes   | no     | no            |
+| `eo-router-b-switchable-port`     | `STATE_ONLY`    | no    | yes   | no     | no            |
 | `eo-pdu-1`                        | `UNOBSERVED`    | no    | no    | no     | no            |
 | `eo-pdu-outlet-1`                 | `POWER_ONLY`    | yes   | no    | no     | yes           |
 | `eo-ai-node-1-nic-1`              | `UNOBSERVED`    | no    | no    | no     | no            |
@@ -65,9 +65,9 @@ Classes describe evidence in the deterministic event catalog, not new YANG leave
 
 - Device ID: `pdu-1`
 - Hardware component: `server-A`
-- Class: `STATE_ONLY`
+- Class: `TOPOLOGY_ONLY`
 - Power evidence: not observed
-- State evidence: observed
+- State evidence: not observed
 - Energy evidence: observed
 - Relationship evidence: defined
 
@@ -75,9 +75,9 @@ Classes describe evidence in the deterministic event catalog, not new YANG leave
 
 - Device ID: `pdu-1`
 - Hardware component: `server-B`
-- Class: `STATE_ONLY`
+- Class: `TOPOLOGY_ONLY`
 - Power evidence: not observed
-- State evidence: observed
+- State evidence: not observed
 - Energy evidence: observed
 - Relationship evidence: defined
 
@@ -121,10 +121,10 @@ Classes describe evidence in the deterministic event catalog, not new YANG leave
 - Energy evidence: not observed
 - Relationship evidence: defined
 
-### eo-router-b-non-critical-port
+### eo-router-b-switchable-port
 
 - Device ID: `router-B`
-- Hardware component: `non-critical-port`
+- Hardware component: `switchable-port`
 - Class: `STATE_ONLY`
 - Power evidence: not observed
 - State evidence: observed
@@ -494,4 +494,4 @@ Classes describe evidence in the deterministic event catalog, not new YANG leave
 
 Class semantics: `FULL` has event evidence of both instantaneous Power and power State; `POWER_ONLY` has Power evidence; `STATE_ONLY` has State evidence; `TOPOLOGY_ONLY` has interval/cumulative Energy or relationship evidence but no Power/State evidence; `UNOBSERVED` has no event measurement, state, or relationship evidence beyond inventory identity.
 
-Counts: FULL=10, POWER_ONLY=8, STATE_ONLY=5, TOPOLOGY_ONLY=10, UNOBSERVED=11
+Counts: FULL=10, POWER_ONLY=8, STATE_ONLY=3, TOPOLOGY_ONLY=12, UNOBSERVED=11

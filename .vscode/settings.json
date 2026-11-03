@@ -1,4 +1,18 @@
 {
     "python-envs.defaultEnvManager": "ms-python.python:venv",
-    "python.defaultInterpreterPath": "${workspaceFolder}/minrun3/.venv/Scripts/python.exe"
+    "python.defaultInterpreterPath": "${workspaceFolder}/minrun4/.venv/Scripts/python.exe"
+}
+
+{
+  "chat.tools.terminal.autoApprove": {
+    "C:\\Windows\\System32\\wsl.exe -d Ubuntu-22.04 --exec": true
+  }
+}
+
+{
+  "chat.tools.terminal.enableAutoApprove": true,
+  "chat.tools.terminal.autoApprove": {
+    "/^Set-Location\\s+C:\\\\Users\\\\edys6252\\\\dans\\\\2027\\\\grmis\\\\minrun4$/i": true,
+    "/^py\\s+run\\.py$/i": true
+  }
 }

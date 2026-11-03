@@ -1,0 +1,31 @@
+Capture date: 2026-11-02
+Status: partial; web server verified, NETCONF validation pending
+
+Operating system: Ubuntu 22.04.1 under WSL 2
+Python: 3.10.12
+pip: 26.2.2 (observed before the WSL filesystem error)
+setuptools: 84.2.1 (observed before the WSL filesystem error)
+wheel: 0.48.0 (observed before the WSL filesystem error)
+
+yangsuite: 3.0.14
+yangsuite-netconf: 1.17.27
+yangsuite-devices: 2.9.16
+yangsuite-filemanager: 1.9.13
+yangsuite-yangtree: 2.1.12
+Django: 4.2.30
+ncclient: 0.7.1
+Paramiko: 5.1.0
+
+Initial pip check: passed before the WSL I/O failure.
+Post-reinstall pip check: passed; no broken requirements found.
+CLI: `yangsuite --help` completed after reinstalling pinned packages and their
+dependencies.
+Windows launcher: started the WSL server; port 8480 accepted connections.
+YANG Suite URL: http://localhost:8480 returned HTTP 200 with
+Content-Type `text/html; charset=utf-8`.
+Listener: 127.0.0.1:8480 (loopback only; verified with `ss`).
+Repository health check: passed; `pip check` clean and the root URL returned
+HTTP 302 (redirect response).
+Onboarding: the installed email-save handler returns HTTP 500 for `@gmail`
+addresses and requests a company email; no address is recorded here.
+NETCONF target: expected 127.0.0.1:830; listener/connection not verified.

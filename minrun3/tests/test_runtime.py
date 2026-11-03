@@ -1,7 +1,10 @@
 import pytest
+from pathlib import Path
+from types import SimpleNamespace
 
 from green.__main__ import main, run_demo
 from green.simulator import EventSimulator
+import run
 from run import pause_for_review
 
 
@@ -118,3 +121,50 @@ def test_review_pause_uses_injected_input() -> None:
     pause_for_review("Press ENTER to close", fake_input)
 
     assert prompts == ["Press ENTER to close"]
+
+
+def test_launcher_prefers_project_virtualenv(tmp_path: Path, monkeypatch) -> None:
+    environment_dir = tmp_path / ".venv"
+    local_python = environment_dir / (
+        Path("Scripts") / "python.exe" if run.os.name == "nt" else Path("bin") / "python"
+    )
+    local_python.parent.mkdir(parents=True)
+    local_python.touch()
+    monkeypatch.setattr(run, "__file__", str(tmp_path / "run.py"))
+
+    assert run.project_python() == str(local_python)
+
+
+def test_launcher_passes_auto_interval_to_runtime(monkeypatch) -> None:
+    commands: list[list[str]] = []
+    working_directories: list[Path | None] = []
+
+    def fake_run(command: list[str], **kwargs):
+        commands.append(command)
+        working_directories.append(kwargs.get("cwd"))
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(run, "project_python", lambda: "project-python")
+    monkeypatch.setattr(run.subprocess, "run", fake_run)
+    monkeypatch.setattr(run, "pause_for_review", lambda *_args: None)
+
+    assert run.main(["--auto", "--interval", "0"]) == 0
+    assert commands == [
+        ["project-python", "-m", "pytest", "-v"],
+        ["project-python", "-m", "green", "--auto", "--interval", "0.0"],
+    ]
+    project_dir = Path(run.__file__).resolve().parent
+    assert working_directories == [project_dir, project_dir]
+
+
+def test_launcher_marks_wsl_netconf_as_not_configured(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(run, "project_python", lambda: "project-python")
+    monkeypatch.setattr(
+        run.subprocess,
+        "run",
+        lambda *_args, **_kwargs: SimpleNamespace(returncode=0),
+    )
+    monkeypatch.setattr(run, "pause_for_review", lambda *_args: None)
+
+    assert run.main(["--auto", "--interval", "0"]) == 0
+    assert "WSL NETCONF not configured in minrun3 (Python/YANG adapter only)." in capsys.readouterr().out

@@ -1,0 +1,52 @@
+{
+  "ietf-hardware:hardware": {
+    "component": [
+      {
+        "name": "backup-battery",
+        "class": "iana-hardware:battery"
+      },
+      {
+        "name": "backup-battery-unknown",
+        "class": "iana-hardware:battery"
+      },
+      {
+        "name": "backup-battery-unavailable",
+        "class": "iana-hardware:battery"
+      }
+    ]
+  },
+  "ietf-power-and-energy:energy-objects": {
+    "energy-object": [
+      {
+        "id": "eo-backup-battery",
+        "source-component-id": "backup-battery",
+        "example-green-power-energy-gaps:battery-state-of-charge": {
+          "status": "available",
+          "state-of-charge-percent": 15.00
+        }
+      },
+      {
+        "id": "eo-backup-battery-empty",
+        "source-component-id": "backup-battery-unknown",
+        "example-green-power-energy-gaps:battery-state-of-charge": {
+          "status": "available",
+          "state-of-charge-percent": 0.00
+        }
+      },
+      {
+        "id": "eo-backup-battery-unknown",
+        "source-component-id": "backup-battery-unknown",
+        "example-green-power-energy-gaps:battery-state-of-charge": {
+          "status": "unknown"
+        }
+      },
+      {
+        "id": "eo-backup-battery-unavailable",
+        "source-component-id": "backup-battery-unavailable",
+        "example-green-power-energy-gaps:battery-state-of-charge": {
+          "status": "unavailable"
+        }
+      }
+    ]
+  }
+}

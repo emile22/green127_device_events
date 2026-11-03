@@ -121,4 +121,4 @@ runtime-control tests.
 - `src/green/accounting.py`: compatibility checks and topology-aware accounting.
 - `src/green/__main__.py`: interactive runtime and CLI.
 - `tests/`: accounting, topology, simulator, and runtime behavior.
-- `prompts/green_minimal_uc_2_13_uc_2_10_live.prompt.md`: implementation prompt.
+- `prompts/green2_minimal_uc_2_13_uc_2_10_live.prompt.md`: implementation prompt.

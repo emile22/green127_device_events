@@ -1,0 +1,1039 @@
+{
+  "input_path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\ctrlrun7\\docs\\green8_input.json",
+  "schema_corpus": {
+    "unique_module_revisions": [
+      {
+        "module": "iana-hardware",
+        "revision": "2018-03-13",
+        "copies": [
+          {
+            "module": "iana-hardware",
+            "revision": "2018-03-13",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\allrun5\\yang\\iana-hardware@2018-03-13.yang",
+            "sha256": "58f3f0f191fab251c9d90b0afdefccd12b15e23e6694f66cfed8965c513ef1ac",
+            "imports": []
+          },
+          {
+            "module": "iana-hardware",
+            "revision": "2018-03-13",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun3\\yang\\iana-hardware@2018-03-13.yang",
+            "sha256": "58f3f0f191fab251c9d90b0afdefccd12b15e23e6694f66cfed8965c513ef1ac",
+            "imports": []
+          },
+          {
+            "module": "iana-hardware",
+            "revision": "2018-03-13",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun4\\yang\\iana-hardware@2018-03-13.yang",
+            "sha256": "58f3f0f191fab251c9d90b0afdefccd12b15e23e6694f66cfed8965c513ef1ac",
+            "imports": []
+          }
+        ],
+        "identical_copies": true,
+        "sha256_variants": [
+          "58f3f0f191fab251c9d90b0afdefccd12b15e23e6694f66cfed8965c513ef1ac"
+        ]
+      },
+      {
+        "module": "iana-power-and-energy",
+        "revision": "2026-07-02",
+        "copies": [
+          {
+            "module": "iana-power-and-energy",
+            "revision": "2026-07-02",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\allrun5\\yang\\iana-power-and-energy@2026-07-02.yang",
+            "sha256": "a146ae544ae158ace6228d8a539780741b3db5c9bb9f6d170102945d3c54d8f5",
+            "imports": []
+          },
+          {
+            "module": "iana-power-and-energy",
+            "revision": "2026-07-02",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun3\\yang\\iana-power-and-energy@2026-07-02.yang",
+            "sha256": "a146ae544ae158ace6228d8a539780741b3db5c9bb9f6d170102945d3c54d8f5",
+            "imports": []
+          },
+          {
+            "module": "iana-power-and-energy",
+            "revision": "2026-07-02",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun4\\yang\\iana-power-and-energy@2026-07-02.yang",
+            "sha256": "a146ae544ae158ace6228d8a539780741b3db5c9bb9f6d170102945d3c54d8f5",
+            "imports": []
+          }
+        ],
+        "identical_copies": true,
+        "sha256_variants": [
+          "a146ae544ae158ace6228d8a539780741b3db5c9bb9f6d170102945d3c54d8f5"
+        ]
+      },
+      {
+        "module": "ietf-hardware",
+        "revision": "2018-03-13",
+        "copies": [
+          {
+            "module": "ietf-hardware",
+            "revision": "2018-03-13",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\allrun5\\yang\\ietf-hardware@2018-03-13.yang",
+            "sha256": "e14aad930e6c6466f5d1ecc12c5c4818e9553a357a9598b6d67f6bed587a6883",
+            "imports": [
+              "iana-hardware",
+              "ietf-inet-types",
+              "ietf-yang-types"
+            ]
+          },
+          {
+            "module": "ietf-hardware",
+            "revision": "2018-03-13",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun3\\yang\\ietf-hardware@2018-03-13.yang",
+            "sha256": "e14aad930e6c6466f5d1ecc12c5c4818e9553a357a9598b6d67f6bed587a6883",
+            "imports": [
+              "iana-hardware",
+              "ietf-inet-types",
+              "ietf-yang-types"
+            ]
+          },
+          {
+            "module": "ietf-hardware",
+            "revision": "2018-03-13",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun4\\yang\\ietf-hardware@2018-03-13.yang",
+            "sha256": "e14aad930e6c6466f5d1ecc12c5c4818e9553a357a9598b6d67f6bed587a6883",
+            "imports": [
+              "iana-hardware",
+              "ietf-inet-types",
+              "ietf-yang-types"
+            ]
+          }
+        ],
+        "identical_copies": true,
+        "sha256_variants": [
+          "e14aad930e6c6466f5d1ecc12c5c4818e9553a357a9598b6d67f6bed587a6883"
+        ]
+      },
+      {
+        "module": "ietf-inet-types",
+        "revision": "2013-07-15",
+        "copies": [
+          {
+            "module": "ietf-inet-types",
+            "revision": "2013-07-15",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\allrun5\\yang\\ietf-inet-types@2013-07-15.yang",
+            "sha256": "12d98b0143a5ca5095b36420f9ebc1ffa61cfd2eaa850080244cadf01b86ddf9",
+            "imports": []
+          },
+          {
+            "module": "ietf-inet-types",
+            "revision": "2013-07-15",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun3\\yang\\ietf-inet-types@2013-07-15.yang",
+            "sha256": "12d98b0143a5ca5095b36420f9ebc1ffa61cfd2eaa850080244cadf01b86ddf9",
+            "imports": []
+          },
+          {
+            "module": "ietf-inet-types",
+            "revision": "2013-07-15",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun4\\yang\\ietf-inet-types@2013-07-15.yang",
+            "sha256": "12d98b0143a5ca5095b36420f9ebc1ffa61cfd2eaa850080244cadf01b86ddf9",
+            "imports": []
+          }
+        ],
+        "identical_copies": true,
+        "sha256_variants": [
+          "12d98b0143a5ca5095b36420f9ebc1ffa61cfd2eaa850080244cadf01b86ddf9"
+        ]
+      },
+      {
+        "module": "ietf-power-and-energy",
+        "revision": "2026-07-02",
+        "copies": [
+          {
+            "module": "ietf-power-and-energy",
+            "revision": "2026-07-02",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\allrun5\\yang\\ietf-power-and-energy@2026-07-02.yang",
+            "sha256": "caed55175285a4dd550f803a407389b8f1c7832847a37ad9246b7bedd250b2d3",
+            "imports": [
+              "iana-power-and-energy",
+              "ietf-hardware"
+            ]
+          },
+          {
+            "module": "ietf-power-and-energy",
+            "revision": "2026-07-02",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun3\\yang\\ietf-power-and-energy@2026-07-02.yang",
+            "sha256": "caed55175285a4dd550f803a407389b8f1c7832847a37ad9246b7bedd250b2d3",
+            "imports": [
+              "iana-power-and-energy",
+              "ietf-hardware"
+            ]
+          },
+          {
+            "module": "ietf-power-and-energy",
+            "revision": "2026-07-02",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun4\\yang\\ietf-power-and-energy@2026-07-02.yang",
+            "sha256": "caed55175285a4dd550f803a407389b8f1c7832847a37ad9246b7bedd250b2d3",
+            "imports": [
+              "iana-power-and-energy",
+              "ietf-hardware"
+            ]
+          }
+        ],
+        "identical_copies": true,
+        "sha256_variants": [
+          "caed55175285a4dd550f803a407389b8f1c7832847a37ad9246b7bedd250b2d3"
+        ]
+      },
+      {
+        "module": "ietf-yang-types",
+        "revision": "2013-07-15",
+        "copies": [
+          {
+            "module": "ietf-yang-types",
+            "revision": "2013-07-15",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\allrun5\\yang\\ietf-yang-types@2013-07-15.yang",
+            "sha256": "a04cdcc875764a76e89b7a0200c6b9d800b10713978093acda7840c7c2907c3f",
+            "imports": []
+          },
+          {
+            "module": "ietf-yang-types",
+            "revision": "2013-07-15",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun3\\yang\\ietf-yang-types@2013-07-15.yang",
+            "sha256": "a04cdcc875764a76e89b7a0200c6b9d800b10713978093acda7840c7c2907c3f",
+            "imports": []
+          },
+          {
+            "module": "ietf-yang-types",
+            "revision": "2013-07-15",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun4\\yang\\ietf-yang-types@2013-07-15.yang",
+            "sha256": "a04cdcc875764a76e89b7a0200c6b9d800b10713978093acda7840c7c2907c3f",
+            "imports": []
+          }
+        ],
+        "identical_copies": true,
+        "sha256_variants": [
+          "a04cdcc875764a76e89b7a0200c6b9d800b10713978093acda7840c7c2907c3f"
+        ]
+      }
+    ],
+    "duplicate_revision_variants": [],
+    "expected_modules": {
+      "ietf-power-and-energy": "present",
+      "ietf-hardware": "present",
+      "iana-power-and-energy": "present",
+      "iana-hardware": "present",
+      "ietf-inet-types": "present",
+      "ietf-yang-types": "present",
+      "ietf-green-controller": "not found in repository YANG corpus",
+      "ietf-green-capability-discovery": "not found in repository YANG corpus",
+      "ietf-network": "not found in repository YANG corpus",
+      "ietf-network-topology": "not found in repository YANG corpus",
+      "ietf-ivys-network-inventory": "not found in repository YANG corpus"
+    },
+    "active_sysrepo_features": {
+      "status": "observed",
+      "module": "ietf-hardware",
+      "features": [],
+      "source": "sysrepoctl -l"
+    }
+  },
+  "decisions": [
+    {
+      "candidate": {
+        "uc": "UC 2.1",
+        "uc_full_name": "Incremental Application of the GREEN Framework",
+        "event_ids": [
+          "U1-0",
+          "U1-1",
+          "U1-2",
+          "U1-3"
+        ],
+        "requirement": "Retain provenance and uncertainty for the legacy baseline when comparing it with later measurements.",
+        "scope": "controller",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id"
+        ],
+        "coverage": "absent",
+        "workaround": "Keep baseline source, observed value, and comparison as controller metadata; do not label unknown telemetry as zero.",
+        "impact": "Baseline comparisons remain contextual and cannot be reconstructed from current Energy Object leaves alone.",
+        "example_runtime_value": "baseline-power-w=500; baseline-source=vendor-datasheet; green-telemetry=unknown"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree"
+      ],
+      "decision": "NOT A GAP",
+      "rationale": "The baseline comparison and vendor source are controller-side provenance; existing data-source-accuracy identities cover measured, estimated, and static source quality, and no interoperable device baseline field is required by the event text."
+    },
+    {
+      "candidate": {
+        "uc": "UC 2.2",
+        "uc_full_name": "Selective reduction of energy consumption in network parts proportional to traffic levels",
+        "event_ids": [
+          "U2-0",
+          "U2-1",
+          "U2-2",
+          "U2-3",
+          "U2-4"
+        ],
+        "requirement": "Relate traffic condition and service continuity to component power-state transitions.",
+        "scope": "controller",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id"
+        ],
+        "coverage": "absent",
+        "workaround": "Keep traffic-condition, traffic-action, and service-continuity in controller metadata; consume reported power and operational state separately.",
+        "impact": "A snapshot does not by itself encode why a component entered low power.",
+        "example_runtime_value": "traffic-condition=valley; service-continuity=maintained"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree"
+      ],
+      "decision": "NOT A GAP",
+      "rationale": "Traffic condition and service continuity are controller policy inputs; the device model already exposes current power and operational state, so no additional energy leaf is required."
+    },
+    {
+      "candidate": {
+        "uc": "UC 2.5",
+        "uc_full_name": "Indirect Energy Monitoring and control",
+        "event_ids": [
+          "U5-0",
+          "U5-1",
+          "U5-2",
+          "U5-3"
+        ],
+        "requirement": "Distinguish a direct target measurement from an external meter correlated with an uninstrumented target.",
+        "scope": "controller",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/measurement-local"
+        ],
+        "coverage": "partial",
+        "workaround": "Use explicit metering/powering relationships and preserve target-direct-measurement=unknown as controller metadata.",
+        "impact": "The external reading is visible, but attribution and direct-versus-indirect status require controller context.",
+        "example_runtime_value": "eo-pdu-outlet-1=680 W; target-direct-measurement=unknown"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:measurement-local present in pyang tree"
+      ],
+      "decision": "NOT A GAP",
+      "rationale": "The model has measurement-local and directional metering/powering relationships. The target's unknown direct measurement remains correctly represented as unknown controller context."
+    },
+    {
+      "candidate": {
+        "uc": "UC 2.6",
+        "uc_full_name": "Consideration of other domains for obtention of end-to-end metrics",
+        "event_ids": [
+          "U6-0",
+          "U6-1",
+          "U6-2",
+          "U6-3"
+        ],
+        "requirement": "Normalize domain inputs and retain the composition and boundary-guard provenance of an end-to-end value.",
+        "scope": "controller",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship[type='aggregating']/peer"
+        ],
+        "coverage": "partial",
+        "workaround": "Keep source-domain values, normalization, shared-boundary decision, and composed result with controller provenance.",
+        "impact": "An aggregate Energy Object is visible, but the operation and contributing domain lineage are not in the snapshot.",
+        "example_runtime_value": "mapping-status=normalized-to-Wh; accounting-guard=domain-boundary"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:peer present in pyang tree"
+      ],
+      "decision": "NOT A GAP",
+      "rationale": "Aggregating/aggregated-by and power/energy leaves represent the objects and readings; normalization, boundary guards, and lineage are processing provenance, not missing device state."
+    },
+    {
+      "candidate": {
+        "uc": "UC 2.7",
+        "uc_full_name": "Dynamic adjustment of network element throughput according to traffic levels in wireless transport networks",
+        "event_ids": [
+          "U7-0",
+          "U7-1",
+          "U7-2",
+          "U7-3"
+        ],
+        "requirement": "Associate a radio throughput profile and traffic condition with observed link power.",
+        "scope": "controller",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id"
+        ],
+        "coverage": "absent",
+        "workaround": "Retain traffic condition, throughput profile, and service-continuity as controller metadata alongside YANG power-state and measurement leaves.",
+        "impact": "The current operational snapshot has no traffic-profile context for a link power value.",
+        "example_runtime_value": "traffic-condition=normal; throughput-profile=maximum"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree"
+      ],
+      "decision": "NOT A GAP",
+      "rationale": "Throughput profile and traffic condition are network-control context outside this energy-object operational model; the controller can retain them as metadata."
+    },
+    {
+      "candidate": {
+        "uc": "UC 2.8",
+        "uc_full_name": "Video streaming use case",
+        "event_ids": [
+          "U8-0",
+          "U8-1",
+          "U8-2",
+          "U8-3"
+        ],
+        "requirement": "Relate delivery strategy and cache placement to observed energy values without asserting a standardized control protocol.",
+        "scope": "controller",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id"
+        ],
+        "coverage": "absent",
+        "workaround": "Keep delivery-strategy and cache-placement as explicitly simulator/controller metadata.",
+        "impact": "Energy Objects can be measured, but delivery choices are not part of their current operational data.",
+        "example_runtime_value": "delivery-strategy=multicast-demonstration; cache-placement=near-users"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree"
+      ],
+      "decision": "NOT A GAP",
+      "rationale": "Delivery strategy and cache placement are application/controller context; the current energy objects already carry the observed power values."
+    },
+    {
+      "candidate": {
+        "uc": "UC 2.9",
+        "uc_full_name": "WLAN Network Energy Saving",
+        "event_ids": [
+          "U9-0",
+          "U9-1",
+          "U9-2",
+          "U9-3",
+          "U9-4"
+        ],
+        "requirement": "Relate AP power-state and PoE power changes to coverage and recovery-delay constraints.",
+        "scope": "controller",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper"
+        ],
+        "coverage": "partial",
+        "workaround": "Use power-state and explicit enabling/metering/powering edges; keep coverage and recovery-delay constraints as controller metadata.",
+        "impact": "Power state is represented, while the service constraint that governs mode choice is not.",
+        "example_runtime_value": "wlan-mode=poe-power-off; recovery-delay=minutes"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree"
+      ],
+      "decision": "NOT A GAP",
+      "rationale": "The generic operational power-state leaf plus enabling, metering, and powering relationships represent the device state and topology; coverage and recovery-delay constraints are controller policy."
+    },
+    {
+      "candidate": {
+        "uc": "UC 2.10",
+        "uc_full_name": "Fixed Network Energy Saving",
+        "event_ids": [
+          "U10-0",
+          "U10-1",
+          "U10-2",
+          "U10-3"
+        ],
+        "requirement": "Compare energy measurements over a defined interval and distinguish interval energy from cumulative counters.",
+        "scope": "device",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed"
+        ],
+        "coverage": "ambiguous",
+        "workaround": "Keep raw counters and interval labels in controller metadata; do not aggregate values without compatible interval and reset semantics.",
+        "impact": "The leaf is cumulative and its declared units conflict with its description; interval boundaries are not explicit in the current snapshot.",
+        "example_runtime_value": "eo-upstream-meter=80 Wh interval; eo-server-b=20 Wh interval"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "total-energy-consumed cumulative counter: True",
+        "explicit interval start/end leaves: False",
+        "explicit interval-energy-consumed leaf: False",
+        "units statement declares Watt-hours; prose description also mentions mWh"
+      ],
+      "decision": "NOT A GAP",
+      "rationale": "The existing operational cumulative counter can be sampled and differenced by the controller; the controller records retrieval timestamps and can mark counter decreases/reset uncertainty incomplete. The machine-readable units statement declares Watt-hours; its conflicting prose is an editorial clarification candidate, not an unrepresentable node."
+    },
+    {
+      "candidate": {
+        "uc": "UC 2.11",
+        "uc_full_name": "Energy Efficiency Network Management",
+        "event_ids": [
+          "U11-0",
+          "U11-1",
+          "U11-2",
+          "U11-3"
+        ],
+        "requirement": "Preserve telemetry history and distinguish optimized, legacy, and unknown capability classifications.",
+        "scope": "controller",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/data-source-accuracy"
+        ],
+        "coverage": "partial",
+        "workaround": "Keep collected snapshots and classification provenance in the controller; retain unknown as unknown.",
+        "impact": "Current power and accuracy identities are observable, but history and the use-case classification are controller-derived.",
+        "example_runtime_value": "router-A-class=optimized; router-B-class=legacy; unsupported-capability=unknown"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:data-source-accuracy present in pyang tree"
+      ],
+      "decision": "NOT A GAP",
+      "rationale": "Existing data-source-accuracy identities cover measured/estimated/static/unavailable source quality; history and optimized/legacy classification are controller-derived."
+    },
+    {
+      "candidate": {
+        "uc": "UC 2.12",
+        "uc_full_name": "ISAC-enabled Energy-Aware Smart City Traffic Management",
+        "event_ids": [
+          "U12-0",
+          "U12-1",
+          "U12-2",
+          "U12-3",
+          "U12-4"
+        ],
+        "requirement": "Relate sensing mode and energy-aware routing to the requirement that critical sensing remains active.",
+        "scope": "controller",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id"
+        ],
+        "coverage": "absent",
+        "workaround": "Keep sensing mode, traffic action, and critical-function status as controller metadata; observe power-state and measurements independently.",
+        "impact": "Reported component power does not encode the sensing or critical-service context.",
+        "example_runtime_value": "sensing-mode=low-power; critical-sensing=active"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree"
+      ],
+      "decision": "NOT A GAP",
+      "rationale": "Sensing modes, traffic routing, and critical-function policy are application/controller semantics; hardware state, power, and aggregation relationships are available for the energy view."
+    },
+    {
+      "candidate": {
+        "uc": "UC 2.13",
+        "uc_full_name": "Double Accounting Open issue",
+        "event_ids": [
+          "U13-0",
+          "U13-1",
+          "U13-2",
+          "U13-3"
+        ],
+        "requirement": "Determine whether a measurement boundary is complete and whether a de-duplicated accounting result is authoritative.",
+        "scope": "controller",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship[type='metering']/peer"
+        ],
+        "coverage": "partial",
+        "workaround": "Traverse explicit metering edges; retain raw measurements and report incomplete topology without an accounted total.",
+        "impact": "Relationships expose topology, but completeness and accounting status are computed controller-side.",
+        "example_runtime_value": "relationship-change=server-B-path-removed"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:peer present in pyang tree"
+      ],
+      "decision": "NOT A GAP",
+      "rationale": "Existing directional metering relationships are sufficient to compute topology completeness and accounting status in the controller; no device-side completeness state is required."
+    },
+    {
+      "candidate": {
+        "uc": "UC 2.14",
+        "uc_full_name": "Energy Efficiency Under Power Shortage",
+        "event_ids": [
+          "U14-0",
+          "U14-1",
+          "U14-2",
+          "U14-3",
+          "U14-4"
+        ],
+        "requirement": "Relate power-source and battery level to critical-service preservation and non-critical reduction.",
+        "scope": "controller",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship[type='powering']/peer"
+        ],
+        "coverage": "absent",
+        "workaround": "Preserve power-source, battery-level, and service-priority as controller metadata; keep reported power-state separate.",
+        "impact": "The operational snapshot does not carry the battery and service-priority context needed to interpret the transition.",
+        "example_runtime_value": "power-source=battery; battery-level-percent=15; critical-service=active"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:peer present in pyang tree",
+        "explicit state-of-charge/battery-level node: False",
+        "RFC 8348 generic sensor-data/value-type/units-display representation: True",
+        "generic sensor data is feature-gated by hardware-sensor: True",
+        "hardware-sensor feature enabled in current Sysrepo: False",
+        "IANA hardware battery identity exists: True"
+      ],
+      "decision": "CONFIRMED GAP",
+      "rationale": "A battery state-of-charge is a concrete UC 2.14 operational value demonstrated by U14-1 through U14-3. The active Energy Object schema has no typed state-of-charge leaf. RFC 8348 generic sensor-data is feature-gated (hardware-sensor is not enabled in the inspected Sysrepo module) and its `other` value plus display string does not identify state-of-charge as a machine-readable battery semantic.",
+      "gap": {
+        "gap_id": "GAP-001",
+        "category": "STATE-GAP",
+        "scope": "device operational state",
+        "solution": "Add a local experimental battery-state-of-charge container with explicit available/unknown/unavailable status and a bounded percentage leaf.",
+        "experimental_path": "/ietf-power-and-energy:energy-objects/energy-object/example-green-power-energy-gaps:battery-state-of-charge/state-of-charge-percent",
+        "config": "config false",
+        "type_units": "decimal64 fraction-digits 2, range 0..100, units percent",
+        "test": "test_soc_status_and_percent_validation"
+      }
+    },
+    {
+      "candidate": {
+        "uc": "UC 2.15",
+        "uc_full_name": "Energy-Efficient Management of Distributed AI Training Workloads",
+        "event_ids": [
+          "U15-0",
+          "U15-1",
+          "U15-2",
+          "U15-3"
+        ],
+        "requirement": "Relate energy observations to scheduling window, active-node allocation, and data locality.",
+        "scope": "controller",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper"
+        ],
+        "coverage": "absent",
+        "workaround": "Keep workload schedule, traffic, compression, and placement in controller metadata.",
+        "impact": "Power-state is visible, but workload context is not present in the device data model.",
+        "example_runtime_value": "schedule-window=lower-energy-period; active-nodes=1; data-placement=near-compute"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree"
+      ],
+      "decision": "NOT A GAP",
+      "rationale": "Scheduling windows, workload placement, and active-node policy are controller/application context; existing Energy Objects and power-state leaves expose the relevant device observations."
+    },
+    {
+      "candidate": {
+        "uc": "UC 2.16",
+        "uc_full_name": "Network-level Cross Layer Energy Saving",
+        "event_ids": [
+          "U16-0",
+          "U16-1",
+          "U16-2",
+          "U16-3",
+          "U16-4"
+        ],
+        "requirement": "Represent a cross-layer dependency check and preserve QoS during coordinated low-power transitions.",
+        "scope": "controller",
+        "searched_modules": [
+          "ietf-power-and-energy@2026-07-02",
+          "ietf-hardware@2018-03-13",
+          "iana-power-and-energy@2026-07-02",
+          "iana-hardware@2018-03-13",
+          "ietf-inet-types@2013-07-15",
+          "ietf-yang-types@2013-07-15"
+        ],
+        "searched_paths": [
+          "/ietf-hardware:hardware/component/name",
+          "/ietf-hardware:hardware/component/parent",
+          "/ietf-hardware:hardware/component/parent-rel-pos",
+          "/ietf-power-and-energy:energy-objects/energy-object/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+          "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+          "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id",
+          "/ietf-power-and-energy:energy-objects/energy-object/relationship[type='enabling']/peer",
+          "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper"
+        ],
+        "coverage": "partial",
+        "workaround": "Traverse enabling edges and retain dependency-check and QoS observations as controller metadata.",
+        "impact": "The dependency relation is visible, but coordination progress and service outcome are controller-derived.",
+        "example_runtime_value": "dependency-check=required; coordination=overlay-underlay; service-qos=preserved"
+      },
+      "schema_evidence": [
+        "ietf-hardware:name present in pyang tree",
+        "ietf-hardware:parent present in pyang tree",
+        "ietf-hardware:parent-rel-pos present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:source-component-id present in pyang tree",
+        "ietf-power-and-energy:instantaneous-power present in pyang tree",
+        "ietf-power-and-energy:total-energy-consumed present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree",
+        "ietf-power-and-energy:type present in pyang tree",
+        "ietf-power-and-energy:id present in pyang tree",
+        "ietf-power-and-energy:peer present in pyang tree",
+        "ietf-power-and-energy:oper present in pyang tree"
+      ],
+      "decision": "NOT A GAP",
+      "rationale": "The enabling/enabled-by relationship models functional dependency; coordination progress and QoS policy remain controller-side decision context."
+    }
+  ],
+  "group_b_review": [
+    {
+      "uc": "UC 2.3",
+      "title": "Reporting on Lifecycle Management",
+      "decision": "NOT A GAP candidate based on available text",
+      "modeling_needs_from_text": [
+        "lifecycle embedded-energy/carbon estimates for manufacturing, transport, recyclability, and end-of-life",
+        "location-based carbon factors and energy mix",
+        "backup-source identity and awareness of which backup is in use",
+        "vendor, datasheet, or database information ingestion"
+      ],
+      "rationale": "The draft describes lifecycle reporting inputs and external metadata but gives no concrete event sequence, collection timing, or interoperable device data contract. No lifecycle transitions or external-data behavior are invented.",
+      "source_evidence": "draft-ietf-green-use-cases.md, UC 2.3; allrun5/docs/deferred_group_b.md"
+    },
+    {
+      "uc": "UC 2.4",
+      "title": "Real-time Energy Metering of Virtualised or Cloud-native Network Functions",
+      "decision": "NOT A GAP candidate based on available text",
+      "modeling_needs_from_text": [
+        "real-time energy measurement for virtualized or cloud-native functions",
+        "metering across hardware and software layers",
+        "energy-aware management of dynamic workloads"
+      ],
+      "rationale": "The draft states a high-level metering need but leaves GREEN requirements as TODO; it does not define virtual entity identity, host correlation, shared-energy attribution, migration behavior, or event timing.",
+      "source_evidence": "draft-ietf-green-use-cases.md, UC 2.4; allrun5/docs/deferred_group_b.md"
+    }
+  ],
+  "confirmed_gap_count": 1,
+  "rejected_candidate_count": 13
+}

@@ -1,0 +1,94 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+MODULES = [
+    "ietf-power-and-energy@2026-07-02",
+    "ietf-hardware@2018-03-13",
+    "iana-power-and-energy@2026-07-02",
+    "iana-hardware@2018-03-13",
+    "ietf-inet-types@2013-07-15",
+    "ietf-yang-types@2013-07-15",
+]
+BASE_PATHS = [
+    "/ietf-hardware:hardware/component/name",
+    "/ietf-hardware:hardware/component/parent",
+    "/ietf-hardware:hardware/component/parent-rel-pos",
+    "/ietf-power-and-energy:energy-objects/energy-object/id",
+    "/ietf-power-and-energy:energy-objects/energy-object/source-component-id",
+    "/ietf-power-and-energy:energy-objects/energy-object/power/instantaneous-power",
+    "/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed",
+    "/ietf-power-and-energy:energy-objects/energy-object/power-state/oper",
+    "/ietf-power-and-energy:energy-objects/energy-object/relationship/type",
+    "/ietf-power-and-energy:energy-objects/energy-object/relationship/peer/id",
+]
+
+CANDIDATES: tuple[dict[str, Any], ...] = (
+    {"uc":"UC 2.1","uc_full_name":"Incremental Application of the GREEN Framework","event_ids":["U1-0","U1-1","U1-2","U1-3"],"requirement":"Retain provenance and uncertainty for the legacy baseline when comparing it with later measurements.","scope":"controller","searched_modules":MODULES,"searched_paths":BASE_PATHS,"coverage":"absent","workaround":"Keep baseline source, observed value, and comparison as controller metadata; do not label unknown telemetry as zero.","impact":"Baseline comparisons remain contextual and cannot be reconstructed from current Energy Object leaves alone.","example_runtime_value":"baseline-power-w=500; baseline-source=vendor-datasheet; green-telemetry=unknown"},
+    {"uc":"UC 2.2","uc_full_name":"Selective reduction of energy consumption in network parts proportional to traffic levels","event_ids":["U2-0","U2-1","U2-2","U2-3","U2-4"],"requirement":"Relate traffic condition and service continuity to component power-state transitions.","scope":"controller","searched_modules":MODULES,"searched_paths":BASE_PATHS,"coverage":"absent","workaround":"Keep traffic-condition, traffic-action, and service-continuity in controller metadata; consume reported power and operational state separately.","impact":"A snapshot does not by itself encode why a component entered low power.","example_runtime_value":"traffic-condition=valley; service-continuity=maintained"},
+    {"uc":"UC 2.5","uc_full_name":"Indirect Energy Monitoring and control","event_ids":["U5-0","U5-1","U5-2","U5-3"],"requirement":"Distinguish a direct target measurement from an external meter correlated with an uninstrumented target.","scope":"controller","searched_modules":MODULES,"searched_paths":BASE_PATHS+["/ietf-power-and-energy:energy-objects/energy-object/power/measurement-local"],"coverage":"partial","workaround":"Use explicit metering/powering relationships and preserve target-direct-measurement=unknown as controller metadata.","impact":"The external reading is visible, but attribution and direct-versus-indirect status require controller context.","example_runtime_value":"eo-pdu-outlet-1=680 W; target-direct-measurement=unknown"},
+    {"uc":"UC 2.6","uc_full_name":"Consideration of other domains for obtention of end-to-end metrics","event_ids":["U6-0","U6-1","U6-2","U6-3"],"requirement":"Normalize domain inputs and retain the composition and boundary-guard provenance of an end-to-end value.","scope":"controller","searched_modules":MODULES,"searched_paths":BASE_PATHS+["/ietf-power-and-energy:energy-objects/energy-object/relationship[type='aggregating']/peer"],"coverage":"partial","workaround":"Keep source-domain values, normalization, shared-boundary decision, and composed result with controller provenance.","impact":"An aggregate Energy Object is visible, but the operation and contributing domain lineage are not in the snapshot.","example_runtime_value":"mapping-status=normalized-to-Wh; accounting-guard=domain-boundary"},
+    {"uc":"UC 2.7","uc_full_name":"Dynamic adjustment of network element throughput according to traffic levels in wireless transport networks","event_ids":["U7-0","U7-1","U7-2","U7-3"],"requirement":"Associate a radio throughput profile and traffic condition with observed link power.","scope":"controller","searched_modules":MODULES,"searched_paths":BASE_PATHS,"coverage":"absent","workaround":"Retain traffic condition, throughput profile, and service-continuity as controller metadata alongside YANG power-state and measurement leaves.","impact":"The current operational snapshot has no traffic-profile context for a link power value.","example_runtime_value":"traffic-condition=normal; throughput-profile=maximum"},
+    {"uc":"UC 2.8","uc_full_name":"Video streaming use case","event_ids":["U8-0","U8-1","U8-2","U8-3"],"requirement":"Relate delivery strategy and cache placement to observed energy values without asserting a standardized control protocol.","scope":"controller","searched_modules":MODULES,"searched_paths":BASE_PATHS,"coverage":"absent","workaround":"Keep delivery-strategy and cache-placement as explicitly simulator/controller metadata.","impact":"Energy Objects can be measured, but delivery choices are not part of their current operational data.","example_runtime_value":"delivery-strategy=multicast-demonstration; cache-placement=near-users"},
+    {"uc":"UC 2.9","uc_full_name":"WLAN Network Energy Saving","event_ids":["U9-0","U9-1","U9-2","U9-3","U9-4"],"requirement":"Relate AP power-state and PoE power changes to coverage and recovery-delay constraints.","scope":"controller","searched_modules":MODULES,"searched_paths":BASE_PATHS+["/ietf-power-and-energy:energy-objects/energy-object/power-state/oper"],"coverage":"partial","workaround":"Use power-state and explicit enabling/metering/powering edges; keep coverage and recovery-delay constraints as controller metadata.","impact":"Power state is represented, while the service constraint that governs mode choice is not.","example_runtime_value":"wlan-mode=poe-power-off; recovery-delay=minutes"},
+    {"uc":"UC 2.10","uc_full_name":"Fixed Network Energy Saving","event_ids":["U10-0","U10-1","U10-2","U10-3"],"requirement":"Compare energy measurements over a defined interval and distinguish interval energy from cumulative counters.","scope":"device","searched_modules":MODULES,"searched_paths":BASE_PATHS+["/ietf-power-and-energy:energy-objects/energy-object/energy/total-energy-consumed"],"coverage":"ambiguous","workaround":"Keep raw counters and interval labels in controller metadata; do not aggregate values without compatible interval and reset semantics.","impact":"The leaf is cumulative and its declared units conflict with its description; interval boundaries are not explicit in the current snapshot.","example_runtime_value":"eo-upstream-meter=80 Wh interval; eo-server-b=20 Wh interval"},
+    {"uc":"UC 2.11","uc_full_name":"Energy Efficiency Network Management","event_ids":["U11-0","U11-1","U11-2","U11-3"],"requirement":"Preserve telemetry history and distinguish optimized, legacy, and unknown capability classifications.","scope":"controller","searched_modules":MODULES,"searched_paths":BASE_PATHS+["/ietf-power-and-energy:energy-objects/energy-object/power/data-source-accuracy"],"coverage":"partial","workaround":"Keep collected snapshots and classification provenance in the controller; retain unknown as unknown.","impact":"Current power and accuracy identities are observable, but history and the use-case classification are controller-derived.","example_runtime_value":"router-A-class=optimized; router-B-class=legacy; unsupported-capability=unknown"},
+    {"uc":"UC 2.12","uc_full_name":"ISAC-enabled Energy-Aware Smart City Traffic Management","event_ids":["U12-0","U12-1","U12-2","U12-3","U12-4"],"requirement":"Relate sensing mode and energy-aware routing to the requirement that critical sensing remains active.","scope":"controller","searched_modules":MODULES,"searched_paths":BASE_PATHS,"coverage":"absent","workaround":"Keep sensing mode, traffic action, and critical-function status as controller metadata; observe power-state and measurements independently.","impact":"Reported component power does not encode the sensing or critical-service context.","example_runtime_value":"sensing-mode=low-power; critical-sensing=active"},
+    {"uc":"UC 2.13","uc_full_name":"Double Accounting Open issue","event_ids":["U13-0","U13-1","U13-2","U13-3"],"requirement":"Determine whether a measurement boundary is complete and whether a de-duplicated accounting result is authoritative.","scope":"controller","searched_modules":MODULES,"searched_paths":BASE_PATHS+["/ietf-power-and-energy:energy-objects/energy-object/relationship[type='metering']/peer"],"coverage":"partial","workaround":"Traverse explicit metering edges; retain raw measurements and report incomplete topology without an accounted total.","impact":"Relationships expose topology, but completeness and accounting status are computed controller-side.","example_runtime_value":"relationship-change=server-B-path-removed"},
+    {"uc":"UC 2.14","uc_full_name":"Energy Efficiency Under Power Shortage","event_ids":["U14-0","U14-1","U14-2","U14-3","U14-4"],"requirement":"Relate power-source and battery level to critical-service preservation and non-critical reduction.","scope":"controller","searched_modules":MODULES,"searched_paths":BASE_PATHS+["/ietf-power-and-energy:energy-objects/energy-object/power-state/oper","/ietf-power-and-energy:energy-objects/energy-object/relationship[type='powering']/peer"],"coverage":"absent","workaround":"Preserve power-source, battery-level, and service-priority as controller metadata; keep reported power-state separate.","impact":"The operational snapshot does not carry the battery and service-priority context needed to interpret the transition.","example_runtime_value":"power-source=battery; battery-level-percent=15; critical-service=active"},
+    {"uc":"UC 2.15","uc_full_name":"Energy-Efficient Management of Distributed AI Training Workloads","event_ids":["U15-0","U15-1","U15-2","U15-3"],"requirement":"Relate energy observations to scheduling window, active-node allocation, and data locality.","scope":"controller","searched_modules":MODULES,"searched_paths":BASE_PATHS+["/ietf-power-and-energy:energy-objects/energy-object/power-state/oper"],"coverage":"absent","workaround":"Keep workload schedule, traffic, compression, and placement in controller metadata.","impact":"Power-state is visible, but workload context is not present in the device data model.","example_runtime_value":"schedule-window=lower-energy-period; active-nodes=1; data-placement=near-compute"},
+    {"uc":"UC 2.16","uc_full_name":"Network-level Cross Layer Energy Saving","event_ids":["U16-0","U16-1","U16-2","U16-3","U16-4"],"requirement":"Represent a cross-layer dependency check and preserve QoS during coordinated low-power transitions.","scope":"controller","searched_modules":MODULES,"searched_paths":BASE_PATHS+["/ietf-power-and-energy:energy-objects/energy-object/relationship[type='enabling']/peer","/ietf-power-and-energy:energy-objects/energy-object/power-state/oper"],"coverage":"partial","workaround":"Traverse enabling edges and retain dependency-check and QoS observations as controller metadata.","impact":"The dependency relation is visible, but coordination progress and service outcome are controller-derived.","example_runtime_value":"dependency-check=required; coordination=overlay-underlay; service-qos=preserved"},
+)
+
+
+def candidates_for_green8() -> list[dict[str, Any]]:
+    return [dict(candidate) for candidate in CANDIDATES]
+
+
+def write_coverage_artifacts(project_root: Path) -> list[dict[str, Any]]:
+    docs = project_root / "docs"
+    docs.mkdir(parents=True, exist_ok=True)
+    candidates = candidates_for_green8()
+    coverage_rows = [
+        "# Representation Coverage",
+        "",
+        "Coverage statuses describe what the controller can observe or derive from current data. They are not YANG gap declarations.",
+        "",
+        "| UC | Events | Controller function | Required semantics | Existing module/path | Coverage | Workaround | Operational impact |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    requirement_rows = [
+        "# Requirement to YANG Coverage",
+        "",
+        "| UC and full name | Events | Requirement | Scope | Existing modules | Existing paths searched | Coverage | Metadata workaround | Impact |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for item in candidates:
+        events = ", ".join(item["event_ids"])
+        modules = ", ".join(item["searched_modules"])
+        paths = "; ".join(item["searched_paths"])
+        coverage_rows.append(
+            f"| {item['uc']} {item['uc_full_name']} | {events} | normalize/aggregate/decision preparation | {item['requirement']} | {modules}: {paths} | {item['coverage']} | {item['workaround']} | {item['impact']} |"
+        )
+        requirement_rows.append(
+            f"| {item['uc']} {item['uc_full_name']} | {events} | {item['requirement']} | {item['scope']} | {modules} | {paths} | {item['coverage']} | {item['workaround']} | {item['impact']} |"
+        )
+    (docs / "representation_coverage.md").write_text("\n".join(coverage_rows) + "\n", encoding="utf-8")
+    (docs / "requirement_to_yang_coverage.md").write_text("\n".join(requirement_rows) + "\n", encoding="utf-8")
+    handoff = [
+        {
+            key: value
+            for key, value in item.items()
+            if key in {
+                "uc", "uc_full_name", "event_ids", "requirement", "scope",
+                "searched_modules", "searched_paths", "coverage", "workaround",
+                "impact", "example_runtime_value",
+            }
+        }
+        for item in candidates
+        if item["coverage"] in {"partial", "absent", "ambiguous"}
+    ]
+    (docs / "green8_input.json").write_text(json.dumps(handoff, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return candidates

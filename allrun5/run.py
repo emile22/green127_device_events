@@ -14,7 +14,6 @@ project_source = str(Path(__file__).resolve().parent / "src")
 if project_source not in sys.path:
     sys.path.insert(0, project_source)
 
-from green.cli import SUPPORTED_USE_CASE_IDS, parse_use_case
 from green.topology import demo_energy_objects
 
 
@@ -244,13 +243,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Test and run the GREEN allrun5 simulator")
     parser.add_argument("--auto", action="store_true", help="run all events without prompting")
     parser.add_argument("--interval", type=float, help="automatic-mode delay in seconds")
-    parser.add_argument(
-        "-u",
-        "--uc",
-        type=parse_use_case,
-        metavar="UC",
-        help=f"run only one implemented UC (available: {', '.join(SUPPORTED_USE_CASE_IDS)})",
-    )
     args = parser.parse_args(argv)
     if args.interval is not None and args.interval < 0:
         parser.error("--interval must be non-negative")
@@ -261,32 +253,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 1
         project_dir = Path(__file__).resolve().parent
         python = project_python()
-        if args.uc is None:
-            tests = subprocess.run(
-                [python, "-m", "pytest", "-v"],
-                check=False,
-                stdin=subprocess.DEVNULL,
-                cwd=project_dir,
-            )
-            if tests.returncode != 0:
-                pause_for_review("\nTests failed. Press ENTER to review the trace...", input)
-                return tests.returncode
-            print("\nAll tests passed. Starting the GREEN runtime...\n", flush=True)
-        else:
-            print(
-                f"Skipping full pytest suite for selected {args.uc.value}; "
-                "run python -m pytest -v separately after code changes.",
-                flush=True,
-            )
-            print(f"\nStarting selected {args.uc.value}...\n", flush=True)
+        tests = subprocess.run(
+            [python, "-m", "pytest", "-v"],
+            check=False,
+            stdin=subprocess.DEVNULL,
+            cwd=project_dir,
+        )
+        if tests.returncode != 0:
+            pause_for_review("\nTests failed. Press ENTER to review the trace...", input)
+            return tests.returncode
 
+        print("\nAll tests passed. Starting the GREEN runtime...\n", flush=True)
         runtime_command = [python, "-m", "green"]
         if args.auto:
             runtime_command.append("--auto")
         if args.interval is not None:
             runtime_command.extend(("--interval", str(args.interval)))
-        if args.uc is not None:
-            runtime_command.extend(("--uc", args.uc.value.removeprefix("UC ")))
         runtime = subprocess.run(runtime_command, check=False, cwd=project_dir)
         pause_for_review("\nGREEN runtime ended. Press ENTER to review the trace...", input)
         return runtime.returncode

@@ -1,0 +1,2 @@
+# The GREEN runtime and adapter use the Python standard library only.
+# Runtime-side NETCONF verification is listed in requirements-dev.txt.

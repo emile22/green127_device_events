@@ -1,0 +1,56 @@
+module example-green-power-energy-gaps {
+  yang-version 1.1;
+  namespace "urn:example:green:power-energy:gaps";
+  prefix egpg;
+
+  import ietf-power-and-energy {
+    prefix eo;
+  }
+
+  organization
+    "Local experimental model for GREEN interoperability testing";
+
+  description
+    "Experimental augmentation for confirmed GAP-001 only. This module
+     is not an IETF standard and does not modify ietf-power-and-energy.";
+
+  revision 2026-10-31 {
+    description
+      "Initial local experiment for GAP-001 battery state-of-charge.";
+  }
+
+  augment "/eo:energy-objects/eo:energy-object" {
+    container battery-state-of-charge {
+      config false;
+      description
+        "GAP-001: typed operational battery charge state. Absence of a
+         percentage is not interpreted as zero; status distinguishes
+         available, unknown, and unavailable readings.";
+
+      leaf status {
+        type enumeration {
+          enum available;
+          enum unknown;
+          enum unavailable;
+        }
+        mandatory true;
+        description
+          "GAP-001: availability of the battery state-of-charge measurement.";
+      }
+
+      leaf state-of-charge-percent {
+        when "../status = 'available'";
+        type decimal64 {
+          fraction-digits 2;
+          range "0..100";
+        }
+        units "percent";
+        mandatory true;
+        description
+          "GAP-001: battery state-of-charge in percent, present only
+           when status is available. Zero is a valid empty-battery
+           reading and is distinct from unknown or unavailable.";
+      }
+    }
+  }
+}

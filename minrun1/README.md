@@ -136,5 +136,5 @@ GREEN runtime ended. Press ENTER to close and review the trace...
 - `src/green/accounting.py`: demo-only boundary-meter arithmetic.
 - `src/green/__main__.py`: interactive and automatic console runtime.
 - `tests/`: accounting, simulator, and runtime tests.
-- `prompts/green_minimal_runtime_implementation.prompt.md`: implementation prompt used
+- `prompts/green1_minimal_runtime_implementation.prompt.md`: implementation prompt used
 	for this project.

@@ -30,7 +30,7 @@
 | UC 2.7  | T4 BACKHAUL      | -               | 8      |
 | UC 2.8  | T5 EDGE          | T1 CORE         | 8      |
 | UC 2.9  | T2 AIR           | T3 POWER        | 10     |
-| UC 2.10 | T1 CORE          | T3 POWER        | 8      |
+| UC 2.10 | T1 CORE          | -               | 8      |
 | UC 2.11 | All (T1-T6)      | -               | 8      |
 | UC 2.12 | T6 CITY          | T4 BACKHAUL     | 10     |
 | UC 2.13 | T5 EDGE          | T3 POWER        | 8      |

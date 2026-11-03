@@ -15,7 +15,7 @@
     <parent>router-A</parent>
   </component>
   <component>
-    <name>non-critical-port</name>
+    <name>switchable-port</name>
     <class xmlns:iana="urn:ietf:params:xml:ns:yang:iana-hardware">iana:energy-object</class>
     <parent>router-B</parent>
   </component>

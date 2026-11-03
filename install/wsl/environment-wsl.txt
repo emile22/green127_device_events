@@ -1,0 +1,21 @@
+# Sanitized WSL environment inventory captured 2026-10-31
+Distribution: Ubuntu 22.04.1 LTS (Jammy Jellyfish)
+WSL version: 3.0.1.0
+Kernel: 6.18.40.1-microsoft-standard-WSL2
+GCC: 11.4.0-1ubuntu1~22.04.3
+Make: 4.3
+pkg-config: 0.29.2-1ubuntu3
+Git: 2.34.1
+CMake: not installed; current apt-based native stack and provider build do not use CMake
+Installation prefix: /usr
+Sysrepo repository: /etc/sysrepo
+Plugin directory in current allrun5 installation: allrun5/netconf/plugins (the reproduction kit builds under install/wsl/plugins)
+libyang: 2.0.112 (apt package 2.0.112-6ubuntu2)
+libnetconf2: 2.0.24 (apt package 2.0.24-3build1; pkg-config metadata unavailable)
+Sysrepo: 2.0.53 (apt package 2.0.53-6build1)
+Netopeer2: 2.0.35 (apt package 2.0.35-1ubuntu1)
+yanglint: 2.0.112
+Current service state at inspection: stopped
+NETCONF SSH port: 830
+Current WSL address fallback: dynamic; observed 192.168.102.228 (not pinned)
+Native source checkouts: none found under /usr/local/src or /opt; source commits not recoverable

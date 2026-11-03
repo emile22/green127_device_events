@@ -12,6 +12,31 @@ This repository is at the scaffold stage. The current implementation brief is [`
 - A controller for device discovery, telemetry collection, inventory correlation, energy-topology aggregation, and guarded state changes.
 - YANG model and instance-data validation, automated tests, and a reproducible demo.
 
+
+## Architecture overview
+
+                      Common network
+                           |
+          +----------------+----------------+
+          |                |                |
+     device catalog   topology graph   stable identities
+          |                |                |
+          +----------------+----------------+
+                           |
+                    UC event overlays
+                    allrun events set
+                           |
+                           v
+                 Sysrepo / Netopeer2
+                           |
+                        NETCONF
+                           |
+          +----------------+----------------+
+          |                                 |
+       controller                     discovery
+        ctrlrun                         caprun
+    
+    
 ## Design References
 
 - [Power and Energy YANG Module, draft-ietf-green-power-and-energy-yang-04](https://datatracker.ietf.org/doc/html/draft-ietf-green-power-and-energy-yang-04)

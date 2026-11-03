@@ -1,0 +1,129 @@
+{
+  "device": "fixture-device",
+  "retrieved_at": "2026-10-31T13:40:03.748088+00:00",
+  "ietf-hardware:hardware": {
+    "component": [
+      {
+        "name": "router-A",
+        "class": "iana:energy-object",
+        "uuid": "00000000-0000-4000-8000-000000000010"
+      },
+      {
+        "name": "linecard-1",
+        "class": "iana:energy-object",
+        "parent": "router-A",
+        "parent-rel-pos": 1,
+        "uuid": "00000000-0000-4000-8000-000000000011"
+      },
+      {
+        "name": "pdu-outlet-1",
+        "class": "iana:energy-object",
+        "uuid": "00000000-0000-4000-8000-000000000031"
+      }
+    ]
+  },
+  "ietf-power-and-energy:energy-objects": {
+    "energy-object": [
+      {
+        "id": "eo-router-a",
+        "source-component-id": "router-A",
+        "power": {
+          "instantaneous-power": 420000
+        },
+        "energy": {
+          "total-energy-consumed": 123456
+        },
+        "power-state": {
+          "oper": "power-state-on"
+        },
+        "relationship": {
+          "type": "enabling",
+          "peer": {
+            "id": "eo-linecard-1"
+          }
+        },
+        "device-id": "fixture-device",
+        "hardware-correlation": {
+          "name": "router-A",
+          "uuid": "00000000-0000-4000-8000-000000000010",
+          "class": "iana:energy-object"
+        }
+      },
+      {
+        "id": "eo-linecard-1",
+        "source-component-id": "linecard-1",
+        "power-state": {
+          "oper": "power-state-sleep"
+        },
+        "device-id": "fixture-device",
+        "hardware-correlation": {
+          "name": "linecard-1",
+          "uuid": "00000000-0000-4000-8000-000000000011",
+          "class": "iana:energy-object",
+          "parent": "router-A",
+          "parent-rel-pos": 1
+        }
+      },
+      {
+        "id": "eo-upstream-meter",
+        "source-component-id": "pdu-outlet-1",
+        "relationship": {
+          "type": "powering",
+          "peer": {
+            "id": "eo-router-a"
+          }
+        },
+        "device-id": "fixture-device",
+        "hardware-correlation": {
+          "name": "pdu-outlet-1",
+          "uuid": "00000000-0000-4000-8000-000000000031",
+          "class": "iana:energy-object"
+        }
+      },
+      {
+        "id": "eo-network",
+        "relationship": {
+          "type": "aggregating",
+          "peer": {
+            "id": "eo-router-a"
+          }
+        },
+        "device-id": "fixture-device"
+      }
+    ]
+  },
+  "relationships": [
+    {
+      "source_energy_object_id": "eo-router-a",
+      "relationship_type": "metering",
+      "peer_energy_object_id": "eo-upstream-meter",
+      "direction": "as-reported",
+      "details": "fixture-meter"
+    },
+    {
+      "source_energy_object_id": "eo-router-a",
+      "relationship_type": "enabling",
+      "peer_energy_object_id": "eo-linecard-1",
+      "direction": "as-reported"
+    },
+    {
+      "source_energy_object_id": "eo-upstream-meter",
+      "relationship_type": "powering",
+      "peer_energy_object_id": "eo-router-a",
+      "direction": "as-reported"
+    },
+    {
+      "source_energy_object_id": "eo-network",
+      "relationship_type": "aggregating",
+      "peer_energy_object_id": "eo-router-a",
+      "direction": "as-reported"
+    }
+  ],
+  "identifier_counts": {
+    "device_ids": 1,
+    "energy_object_ids": 4,
+    "hardware_component_names": 3,
+    "hardware_uuids": 3,
+    "relationship_peers": 4
+  }
+}

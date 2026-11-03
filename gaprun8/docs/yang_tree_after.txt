@@ -1,0 +1,111 @@
+## iana-hardware@2018-03-13.yang
+
+
+
+## iana-power-and-energy@2026-07-02.yang
+
+
+
+## ietf-hardware@2018-03-13.yang
+
+module: ietf-hardware
+  +--rw hardware
+     +--ro last-change?   yang:date-and-time
+     +--rw component* [name]
+        +--rw name              string
+        +--rw class             identityref
+        +--ro physical-index?   int32 {entity-mib}?
+        +--ro description?      string
+        +--rw parent?           -> ../../component/name
+        +--rw parent-rel-pos?   int32
+        +--ro contains-child*   -> ../../component/name
+        +--ro hardware-rev?     string
+        +--ro firmware-rev?     string
+        +--ro software-rev?     string
+        +--ro serial-num?       string
+        +--ro mfg-name?         string
+        +--ro model-name?       string
+        +--rw alias?            string
+        +--rw asset-id?         string
+        +--ro is-fru?           boolean
+        +--ro mfg-date?         yang:date-and-time
+        +--rw uri*              inet:uri
+        +--ro uuid?             yang:uuid
+        +--rw state {hardware-state}?
+        |  +--ro state-last-changed?   yang:date-and-time
+        |  +--rw admin-state?          admin-state
+        |  +--ro oper-state?           oper-state
+        |  +--ro usage-state?          usage-state
+        |  +--ro alarm-state?          alarm-state
+        |  +--ro standby-state?        standby-state
+        +--ro sensor-data {hardware-sensor}?
+           +--ro value?               sensor-value
+           +--ro value-type?          sensor-value-type
+           +--ro value-scale?         sensor-value-scale
+           +--ro value-precision?     sensor-value-precision
+           +--ro oper-status?         sensor-status
+           +--ro units-display?       string
+           +--ro value-timestamp?     yang:date-and-time
+           +--ro value-update-rate?   uint32
+
+  notifications:
+    +---n hardware-state-change
+    +---n hardware-state-oper-enabled {hardware-state}?
+    |  +--ro name?          -> /hardware/component/name
+    |  +--ro admin-state?   -> /hardware/component/state/admin-state
+    |  +--ro alarm-state?   -> /hardware/component/state/alarm-state
+    +---n hardware-state-oper-disabled {hardware-state}?
+       +--ro name?          -> /hardware/component/name
+       +--ro admin-state?   -> /hardware/component/state/admin-state
+       +--ro alarm-state?   -> /hardware/component/state/alarm-state
+
+## ietf-inet-types@2013-07-15.yang
+
+
+
+## ietf-power-and-energy@2026-07-02.yang
+
+module: ietf-power-and-energy
+  +--ro energy-objects
+  |  +--ro energy-object* [id]
+  |     +--ro id                     string
+  |     +--ro source-component-id?   -> /hw:hardware/component/name
+  |     +--ro power
+  |     |  +--ro instantaneous-power?    int64
+  |     |  +--ro nameplate-power?        uint32
+  |     |  +--ro data-source-accuracy?   identityref
+  |     |  +--ro power-factor?           power-factor
+  |     |  +--ro measurement-local?      boolean
+  |     +--ro energy
+  |     |  +--ro total-energy-consumed?    uint64
+  |     |  +--ro total-energy-delivered?   uint64
+  |     |  +--ro data-source-accuracy?     identityref
+  |     |  +--ro measurement-local?        boolean
+  |     |  +--ro certifications*           identityref
+  |     +--ro power-state
+  |     |  +--ro oper?   identityref
+  |     +--ro relationship* [type]
+  |        +--ro type    identityref
+  |        +--ro peer* [id]
+  |           +--ro id         string
+  |           +--ro details?   string
+  +--rw energy-control
+     +--rw energy-objects
+        +--rw energy-object* [id]
+           +--rw id             -> /energy-objects/energy-object/id
+           +--rw power-state
+              +--rw admin?   identityref
+              +--rw oper?    -> /energy-objects/energy-object/power-state/oper
+
+## ietf-yang-types@2013-07-15.yang
+
+
+
+## example-green-power-energy-gaps.yang
+
+module: example-green-power-energy-gaps
+
+  augment /eo:energy-objects/eo:energy-object:
+    +--ro battery-state-of-charge
+       +--ro status                     enumeration
+       +--ro state-of-charge-percent    decimal64

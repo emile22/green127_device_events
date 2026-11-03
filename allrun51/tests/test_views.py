@@ -1,10 +1,9 @@
+
 import json
-from io import StringIO
 import xml.etree.ElementTree as ET
 
 from green.netconf_trace import _energy_object_inventory, format_netconf_trace_entry
 from green.models import EventSeries
-from green.netconf_trace import NetconfTraceTailer
 from green.netconf_trace import format_netconf_trace_entry
 from green.simulator import EventSimulator, generate_events
 from green.topology import demo_energy_objects
@@ -94,67 +93,6 @@ def test_energy_object_inventory_stays_readable_in_narrow_terminal():
     rendered = "\n".join(rows)
     assert "Relationships: " in rendered
     assert "AGGREGATING(2)" in rendered
-
-
-def test_selected_uc_summary_shows_interval_average_power_separately():
-    simulator = EventSimulator(use_case=EventSeries.UC_2_10)
-    scenario = simulator.network.scenarios_by_uc[EventSeries.UC_2_10.value]
-    visible_ids = frozenset(
-        energy_object_id
-        for topology in simulator.network.topologies
-        if topology.topology_id in scenario.topology_ids
-        for energy_object_id in topology.energy_object_ids
-    )
-    simulator.next_event()
-    event = simulator.next_event()
-    assert event is not None and event.sequence == "U10-1"
-    data = filter_yang_instance_to_energy_objects(
-        event_to_yang(event, simulator.energy_objects), visible_ids
-    )
-
-    summary = render_summary(event, data, visible_energy_object_ids=visible_ids)
-    lines = summary.splitlines()
-    meter_row = next(line for line in lines if "eo-upstream-meter" in line)
-    server_a_row = next(line for line in lines if "eo-server-a" in line)
-    server_b_row = next(line for line in lines if "eo-server-b" in line)
-    router_a_row = next(line for line in lines if "eo-router-a " in line)
-    router_b_row = next(line for line in lines if "eo-router-b " in line)
-
-    assert "Avg W" in summary
-    assert "N/A" in meter_row and "150" in meter_row
-    assert "N/A" in server_a_row and "60" in server_a_row
-    assert "N/A" in server_b_row and "90" in server_b_row
-    assert "340" in router_a_row
-    assert "330" in router_b_row
-
-
-def test_netconf_trace_table_uses_current_interval_measurements(tmp_path):
-    simulator = EventSimulator(use_case=EventSeries.UC_2_10)
-    simulator.next_event()
-    event = simulator.next_event()
-    assert event is not None and event.sequence == "U10-1"
-    data = event_to_yang(event, simulator.energy_objects)
-    entry = (
-        "[2026-11-02T00:00:00Z] NETCONF operational-data request\n"
-        "operation: <get>\nmodule: ietf-power-and-energy\n"
-        "path: /ietf-power-and-energy:energy-objects\nrequest-xpath: /*\n"
-        "status: ok\nreply-data-json:\n"
-        + json.dumps(data)
-    )
-    output: list[str] = []
-    tailer = NetconfTraceTailer(
-        tmp_path / "trace.log",
-        output.append,
-        interval_energy_measurements=event.measurements,
-    )
-
-    tailer._read_entries(StringIO(entry + "\n\n"), "", 0)
-    rendered = "\n".join(output)
-
-    assert "Avg W" in rendered
-    assert "eo-upstream-meter" in rendered and "150" in rendered
-    assert "eo-server-a" in rendered and "60" in rendered
-    assert "eo-server-b" in rendered and "90" in rendered
 
 
 def test_selected_uc_summary_and_compact_view_only_show_its_topology():

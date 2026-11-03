@@ -313,7 +313,7 @@ def events(deck):
     txt(s, "Device IDs | component names and UUIDs | Energy Object IDs | hierarchy", 1.84,
         5.51, 8.0, 0.25, 11, WHITE, True)
     txt(s, "Reset changes runtime state, not identity.", 9.72, 5.53, 2.5, 0.25, 9, "C5D1C9")
-    footer(s, "Source: docs/event_catalog.md; UC 2.2 example", 7)
+    footer(s, "Source: docs/UC_events_index.md; UC 2.2 example", 7)
 
 
 def relationships(deck):
@@ -394,7 +394,7 @@ def uc13(deck):
     box(s, 0.74, 5.78, 11.86, 0.54, "DCEFED")
     txt(s, "Discovery changes visibility, not the physical topology.", 0.98, 5.94,
         11.25, 0.22, 11, INK, True)
-    footer(s, "Sources: docs/relationship_behavior_classes.md; docs/relationship_coverage.md; docs/event_catalog.md", 10)
+    footer(s, "Sources: docs/relationship_behavior_classes.md; docs/relationship_coverage.md; docs/UC_events_index.md", 10)
 
 
 def operations(deck):

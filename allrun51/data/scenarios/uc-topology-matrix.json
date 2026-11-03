@@ -8,7 +8,7 @@
     {"uc": "UC 2.7", "primary": ["T4-wireless-transport"], "secondary": []},
     {"uc": "UC 2.8", "primary": ["T5-edge-compute"], "secondary": ["T1-fixed-network"]},
     {"uc": "UC 2.9", "primary": ["T2-wlan-poe"], "secondary": ["T3-power-infrastructure"]},
-    {"uc": "UC 2.10", "primary": ["T1-fixed-network"], "secondary": ["T3-power-infrastructure"]},
+    {"uc": "UC 2.10", "primary": ["T1-fixed-network"], "secondary": []},
     {"uc": "UC 2.11", "primary": ["T1-fixed-network", "T2-wlan-poe", "T3-power-infrastructure", "T4-wireless-transport", "T5-edge-compute", "T6-isac-smart-city"], "secondary": []},
     {"uc": "UC 2.12", "primary": ["T6-isac-smart-city"], "secondary": ["T4-wireless-transport"]},
     {"uc": "UC 2.13", "primary": ["T5-edge-compute"], "secondary": ["T3-power-infrastructure"]},

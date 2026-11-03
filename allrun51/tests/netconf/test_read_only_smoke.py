@@ -145,7 +145,7 @@ def test_rfc8348_hardware_get_returns_all_required_components(netconf_manager) -
         "router-B",
         "linecard-1",
         "linecard-2",
-        "non-critical-port",
+        "switchable-port",
     } <= names
 
 
@@ -191,19 +191,23 @@ def test_uc213_topology_changes_are_visible_through_get(netconf_manager) -> None
 def test_uc210_live_energy_and_sleep_wake_are_visible(netconf_manager) -> None:
     publish(event_at("U10-0"))
     objects = get_energy_objects(netconf_manager)
-    assert leaf(objects["eo-upstream-meter"], "energy", "total-energy-consumed") == "300"
+    assert leaf(objects["eo-router-a"], "power", "instantaneous-power") == "500000"
+    assert leaf(objects["eo-router-b"], "power", "instantaneous-power") == "480000"
+    assert "energy" not in objects["eo-upstream-meter"]
 
     publish(event_at("U10-1"))
     objects = get_energy_objects(netconf_manager)
-    assert leaf(objects["eo-upstream-meter"], "energy", "total-energy-consumed") == "450"
+    assert leaf(objects["eo-router-a"], "power", "instantaneous-power") == "340000"
+    assert leaf(objects["eo-router-b"], "power", "instantaneous-power") == "330000"
 
     publish(event_at("U10-2"))
     objects = get_energy_objects(netconf_manager)
-    assert power_state(objects["eo-server-b"]) == "power-state-sleep"
+    assert power_state(objects["eo-router-a-linecard-1"]) == "power-state-sleep"
 
     publish(event_at("U10-3"))
     objects = get_energy_objects(netconf_manager)
-    assert power_state(objects["eo-server-b"]) == "power-state-on"
+    assert power_state(objects["eo-router-a-linecard-1"]) == "power-state-on"
+    assert leaf(objects["eo-router-a"], "power", "instantaneous-power") == "460000"
 
 
 def test_uc21_partial_deployment_exposes_only_measured_component(netconf_manager) -> None:
@@ -237,13 +241,13 @@ def test_uc214_grid_failure_critical_service_and_recovery_are_read_only(netconf_
     publish(event_at("U14-2"))
     battery_objects = get_energy_objects(netconf_manager)
     assert power_state(battery_objects["eo-router-b"]) == "power-state-sleep"
-    assert power_state(battery_objects["eo-router-b-non-critical-port"]) == "power-state-off"
+    assert power_state(battery_objects["eo-router-b-switchable-port"]) == "power-state-off"
 
     publish(event_at("U14-3"))
     critical_objects = get_energy_objects(netconf_manager)
     assert power_state(critical_objects["eo-router-a"]) == "power-state-on"
     assert power_state(critical_objects["eo-router-b"]) == "power-state-sleep"
-    assert power_state(critical_objects["eo-router-b-non-critical-port"]) == "power-state-off"
+    assert power_state(critical_objects["eo-router-b-switchable-port"]) == "power-state-off"
     assert leaf(critical_objects["eo-router-a"], "power", "instantaneous-power") == "380000"
     assert leaf(critical_objects["eo-router-b"], "power", "instantaneous-power") == "200000"
 

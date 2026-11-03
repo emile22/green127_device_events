@@ -1,0 +1,9 @@
+windows/.venv/
+runtime/*
+!runtime/.gitkeep
+logs/*
+!logs/.gitkeep
+wsl/plugins/*.so
+__pycache__/
+*.py[cod]
+.pytest_cache/

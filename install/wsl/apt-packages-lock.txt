@@ -1,0 +1,11 @@
+build-essential=12.9ubuntu3
+pkg-config=0.29.2-1ubuntu3
+libssh-dev=0.9.6-2ubuntu0.22.04.8
+libyang2=2.0.112-6ubuntu2
+libyang2-dev=2.0.112-6ubuntu2
+libyang2-tools=2.0.112-6ubuntu2
+libnetconf2-2=2.0.24-3build1
+libsysrepo-dev=2.0.53-6build1
+sysrepo=2.0.53-6build1
+sysrepo-plugind=2.0.53-6build1
+netopeer2=2.0.35-1ubuntu1
