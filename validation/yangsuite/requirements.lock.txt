@@ -1,7 +1,0 @@
-# Partial top-level selection only; this is NOT a complete pip freeze.
-# Full dependency freezing was blocked by the WSL filesystem I/O failure.
-yangsuite==3.0.14
-yangsuite-netconf==1.17.27
-yangsuite-devices==2.9.16
-yangsuite-filemanager==1.9.13
-yangsuite-yangtree==2.1.12
