@@ -1,5 +1,0 @@
-NETCONF base capability: urn:ietf:params:netconf:base:1.0 or :base:1.1
-YANG module namespace: urn:ietf:params:xml:ns:yang:ietf-hardware
-YANG module revision: ietf-hardware@2018-03-13
-YANG module namespace: urn:ietf:params:xml:ns:yang:ietf-power-and-energy
-YANG module revision: ietf-power-and-energy@2026-07-02
