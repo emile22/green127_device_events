@@ -1,6 +1,0 @@
-commit le tout avec un tag ou un nom personnalisé.
-
-ensuite seulement: ajoute un numero de sequence de tests (genre 3/170) a la fin de " INFO GREEN - Start NETCONF test suite
-Test suite ╸━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   2% 0:00:14
-
-mettre a jour readme.md a vec nom 4 drafts (3 yang) et couvert /non couvert
