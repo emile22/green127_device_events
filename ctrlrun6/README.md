@@ -21,6 +21,6 @@ python -m green_controller --help
 pytest -v
 ```
 
-`--once` opens one NETCONF session and issues one `<get>` for each of the 61 allrun5 catalog events. The YANG tree does not expose simulator event IDs, so each event association is explicitly a controller catalog reference, not a claim that the device reported that event. Raw XML and normalized JSON are stored under `logs/`; the generated catalog is under `docs/`.
+`--once` opens one NETCONF session and issues one `<get>` for each of the 122 allrun5 catalog events. The YANG tree does not expose simulator event IDs, so each event association is explicitly a controller catalog reference, not a claim that the device reported that event. Raw XML and normalized JSON are stored under `logs/`; the generated catalog is under `docs/`.
 
 The observer preserves reported relationship direction. Missing leaves remain absent and are never converted to zero. `instantaneous-power` is retained in the module's declared mWatts. The module declares Watt-hours for total energy while its description says mWh; this observer records the raw value and documents both statements without rescaling.

@@ -106,11 +106,11 @@ def test_event_catalog_observation_issues_one_get_for_each_group_a_event(tmp_pat
     client = FixtureClient()
     observations = observe_event_catalog(client)
     events = load_event_catalog()
-    assert len(events) == 61
-    assert len(observations) == 61
-    assert client.calls == 61
+    assert len(events) == 122
+    assert len(observations) == 122
+    assert client.calls == 122
     assert observations[0].event.event_id == "U1-0"
-    assert observations[-1].event.event_id == "U16-4"
+    assert observations[-1].event.event_id == "U16-9"
     assert "catalog reference only" in observations[0].correlation
 
     destination = tmp_path / "observation_catalog.md"
@@ -120,6 +120,17 @@ def test_event_catalog_observation_issues_one_get_for_each_group_a_event(tmp_pat
     assert "YANG-visible" in report and "controller-metadata-only" in report
     assert "GAP-" not in report
     assert "| gap" not in report.lower()
+
+
+def test_green8_handoff_lists_every_current_event_id_per_uc() -> None:
+    from green_controller.coverage import candidates_for_green8
+
+    events_by_uc: dict[str, list[str]] = {}
+    for event in load_event_catalog():
+        events_by_uc.setdefault(event.uc, []).append(event.event_id)
+
+    handoff = {item["uc"]: item["event_ids"] for item in candidates_for_green8()}
+    assert handoff == events_by_uc
 
 
 def test_snapshot_files_keep_raw_xml_and_normalized_json(tmp_path: Path) -> None:

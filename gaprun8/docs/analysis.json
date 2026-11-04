@@ -16,14 +16,7 @@
           {
             "module": "iana-hardware",
             "revision": "2018-03-13",
-            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun3\\yang\\iana-hardware@2018-03-13.yang",
-            "sha256": "58f3f0f191fab251c9d90b0afdefccd12b15e23e6694f66cfed8965c513ef1ac",
-            "imports": []
-          },
-          {
-            "module": "iana-hardware",
-            "revision": "2018-03-13",
-            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun4\\yang\\iana-hardware@2018-03-13.yang",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\allrun51\\yang\\iana-hardware@2018-03-13.yang",
             "sha256": "58f3f0f191fab251c9d90b0afdefccd12b15e23e6694f66cfed8965c513ef1ac",
             "imports": []
           }
@@ -47,14 +40,7 @@
           {
             "module": "iana-power-and-energy",
             "revision": "2026-07-02",
-            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun3\\yang\\iana-power-and-energy@2026-07-02.yang",
-            "sha256": "a146ae544ae158ace6228d8a539780741b3db5c9bb9f6d170102945d3c54d8f5",
-            "imports": []
-          },
-          {
-            "module": "iana-power-and-energy",
-            "revision": "2026-07-02",
-            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun4\\yang\\iana-power-and-energy@2026-07-02.yang",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\allrun51\\yang\\iana-power-and-energy@2026-07-02.yang",
             "sha256": "a146ae544ae158ace6228d8a539780741b3db5c9bb9f6d170102945d3c54d8f5",
             "imports": []
           }
@@ -82,18 +68,7 @@
           {
             "module": "ietf-hardware",
             "revision": "2018-03-13",
-            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun3\\yang\\ietf-hardware@2018-03-13.yang",
-            "sha256": "e14aad930e6c6466f5d1ecc12c5c4818e9553a357a9598b6d67f6bed587a6883",
-            "imports": [
-              "iana-hardware",
-              "ietf-inet-types",
-              "ietf-yang-types"
-            ]
-          },
-          {
-            "module": "ietf-hardware",
-            "revision": "2018-03-13",
-            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun4\\yang\\ietf-hardware@2018-03-13.yang",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\allrun51\\yang\\ietf-hardware@2018-03-13.yang",
             "sha256": "e14aad930e6c6466f5d1ecc12c5c4818e9553a357a9598b6d67f6bed587a6883",
             "imports": [
               "iana-hardware",
@@ -121,14 +96,7 @@
           {
             "module": "ietf-inet-types",
             "revision": "2013-07-15",
-            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun3\\yang\\ietf-inet-types@2013-07-15.yang",
-            "sha256": "12d98b0143a5ca5095b36420f9ebc1ffa61cfd2eaa850080244cadf01b86ddf9",
-            "imports": []
-          },
-          {
-            "module": "ietf-inet-types",
-            "revision": "2013-07-15",
-            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun4\\yang\\ietf-inet-types@2013-07-15.yang",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\allrun51\\yang\\ietf-inet-types@2013-07-15.yang",
             "sha256": "12d98b0143a5ca5095b36420f9ebc1ffa61cfd2eaa850080244cadf01b86ddf9",
             "imports": []
           }
@@ -155,17 +123,7 @@
           {
             "module": "ietf-power-and-energy",
             "revision": "2026-07-02",
-            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun3\\yang\\ietf-power-and-energy@2026-07-02.yang",
-            "sha256": "caed55175285a4dd550f803a407389b8f1c7832847a37ad9246b7bedd250b2d3",
-            "imports": [
-              "iana-power-and-energy",
-              "ietf-hardware"
-            ]
-          },
-          {
-            "module": "ietf-power-and-energy",
-            "revision": "2026-07-02",
-            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun4\\yang\\ietf-power-and-energy@2026-07-02.yang",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\allrun51\\yang\\ietf-power-and-energy@2026-07-02.yang",
             "sha256": "caed55175285a4dd550f803a407389b8f1c7832847a37ad9246b7bedd250b2d3",
             "imports": [
               "iana-power-and-energy",
@@ -192,14 +150,7 @@
           {
             "module": "ietf-yang-types",
             "revision": "2013-07-15",
-            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun3\\yang\\ietf-yang-types@2013-07-15.yang",
-            "sha256": "a04cdcc875764a76e89b7a0200c6b9d800b10713978093acda7840c7c2907c3f",
-            "imports": []
-          },
-          {
-            "module": "ietf-yang-types",
-            "revision": "2013-07-15",
-            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\minrun4\\yang\\ietf-yang-types@2013-07-15.yang",
+            "path": "C:\\Users\\edys6252\\dans\\2027\\grmis\\allrun51\\yang\\ietf-yang-types@2013-07-15.yang",
             "sha256": "a04cdcc875764a76e89b7a0200c6b9d800b10713978093acda7840c7c2907c3f",
             "imports": []
           }
@@ -240,7 +191,11 @@
           "U1-0",
           "U1-1",
           "U1-2",
-          "U1-3"
+          "U1-3",
+          "U1-4",
+          "U1-5",
+          "U1-6",
+          "U1-7"
         ],
         "requirement": "Retain provenance and uncertainty for the legacy baseline when comparing it with later measurements.",
         "scope": "controller",
@@ -293,7 +248,12 @@
           "U2-1",
           "U2-2",
           "U2-3",
-          "U2-4"
+          "U2-4",
+          "U2-5",
+          "U2-6",
+          "U2-7",
+          "U2-8",
+          "U2-9"
         ],
         "requirement": "Relate traffic condition and service continuity to component power-state transitions.",
         "scope": "controller",
@@ -345,7 +305,11 @@
           "U5-0",
           "U5-1",
           "U5-2",
-          "U5-3"
+          "U5-3",
+          "U5-4",
+          "U5-5",
+          "U5-6",
+          "U5-7"
         ],
         "requirement": "Distinguish a direct target measurement from an external meter correlated with an uninstrumented target.",
         "scope": "controller",
@@ -399,7 +363,11 @@
           "U6-0",
           "U6-1",
           "U6-2",
-          "U6-3"
+          "U6-3",
+          "U6-4",
+          "U6-5",
+          "U6-6",
+          "U6-7"
         ],
         "requirement": "Normalize domain inputs and retain the composition and boundary-guard provenance of an end-to-end value.",
         "scope": "controller",
@@ -453,7 +421,11 @@
           "U7-0",
           "U7-1",
           "U7-2",
-          "U7-3"
+          "U7-3",
+          "U7-4",
+          "U7-5",
+          "U7-6",
+          "U7-7"
         ],
         "requirement": "Associate a radio throughput profile and traffic condition with observed link power.",
         "scope": "controller",
@@ -505,7 +477,11 @@
           "U8-0",
           "U8-1",
           "U8-2",
-          "U8-3"
+          "U8-3",
+          "U8-4",
+          "U8-5",
+          "U8-6",
+          "U8-7"
         ],
         "requirement": "Relate delivery strategy and cache placement to observed energy values without asserting a standardized control protocol.",
         "scope": "controller",
@@ -558,7 +534,12 @@
           "U9-1",
           "U9-2",
           "U9-3",
-          "U9-4"
+          "U9-4",
+          "U9-5",
+          "U9-6",
+          "U9-7",
+          "U9-8",
+          "U9-9"
         ],
         "requirement": "Relate AP power-state and PoE power changes to coverage and recovery-delay constraints.",
         "scope": "controller",
@@ -612,7 +593,11 @@
           "U10-0",
           "U10-1",
           "U10-2",
-          "U10-3"
+          "U10-3",
+          "U10-4",
+          "U10-5",
+          "U10-6",
+          "U10-7"
         ],
         "requirement": "Compare energy measurements over a defined interval and distinguish interval energy from cumulative counters.",
         "scope": "device",
@@ -670,7 +655,11 @@
           "U11-0",
           "U11-1",
           "U11-2",
-          "U11-3"
+          "U11-3",
+          "U11-4",
+          "U11-5",
+          "U11-6",
+          "U11-7"
         ],
         "requirement": "Preserve telemetry history and distinguish optimized, legacy, and unknown capability classifications.",
         "scope": "controller",
@@ -725,7 +714,12 @@
           "U12-1",
           "U12-2",
           "U12-3",
-          "U12-4"
+          "U12-4",
+          "U12-5",
+          "U12-6",
+          "U12-7",
+          "U12-8",
+          "U12-9"
         ],
         "requirement": "Relate sensing mode and energy-aware routing to the requirement that critical sensing remains active.",
         "scope": "controller",
@@ -777,7 +771,11 @@
           "U13-0",
           "U13-1",
           "U13-2",
-          "U13-3"
+          "U13-3",
+          "U13-4",
+          "U13-5",
+          "U13-6",
+          "U13-7"
         ],
         "requirement": "Determine whether a measurement boundary is complete and whether a de-duplicated accounting result is authoritative.",
         "scope": "controller",
@@ -832,7 +830,12 @@
           "U14-1",
           "U14-2",
           "U14-3",
-          "U14-4"
+          "U14-4",
+          "U14-5",
+          "U14-6",
+          "U14-7",
+          "U14-8",
+          "U14-9"
         ],
         "requirement": "Relate power-source and battery level to critical-service preservation and non-critical reduction.",
         "scope": "controller",
@@ -903,7 +906,11 @@
           "U15-0",
           "U15-1",
           "U15-2",
-          "U15-3"
+          "U15-3",
+          "U15-4",
+          "U15-5",
+          "U15-6",
+          "U15-7"
         ],
         "requirement": "Relate energy observations to scheduling window, active-node allocation, and data locality.",
         "scope": "controller",
@@ -958,7 +965,12 @@
           "U16-1",
           "U16-2",
           "U16-3",
-          "U16-4"
+          "U16-4",
+          "U16-5",
+          "U16-6",
+          "U16-7",
+          "U16-8",
+          "U16-9"
         ],
         "requirement": "Represent a cross-layer dependency check and preserve QoS during coordinated low-power transitions.",
         "scope": "controller",

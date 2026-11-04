@@ -1,4 +1,0 @@
-pyang>=2.7.1
-
-[test]
-pytest>=8

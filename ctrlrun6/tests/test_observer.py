@@ -172,14 +172,14 @@ def test_event_catalog_observation_issues_one_get_for_each_group_a_event(tmp_pat
         progress=lambda index, total, event: progress.append((index, total, event.event_id)),
     )
     events = load_event_catalog()
-    assert len(events) == 61
-    assert len(observations) == 61
-    assert client.calls == 61
-    assert len(progress) == 61
-    assert progress[0] == (1, 61, "U1-0")
-    assert progress[-1] == (61, 61, "U16-4")
+    assert len(events) == 122
+    assert len(observations) == 122
+    assert client.calls == 122
+    assert len(progress) == 122
+    assert progress[0] == (1, 122, "U1-0")
+    assert progress[-1] == (122, 122, "U16-9")
     assert observations[0].event.event_id == "U1-0"
-    assert observations[-1].event.event_id == "U16-4"
+    assert observations[-1].event.event_id == "U16-9"
     assert "catalog reference only" in observations[0].correlation
 
     destination = tmp_path / "observation_catalog.md"
@@ -198,7 +198,7 @@ def test_one_shot_explains_catalog_labels_before_collection_progress(tmp_path: P
     assert lines[0] == (
         "Event labels come from allrun5/docs/event_catalog.md; each snapshot is fetched via NETCONF <get>."
     )
-    assert lines[1].startswith("[01/61] Collected UC 2.1 U1-0 LEGACY_BASELINE")
+    assert lines[1].startswith("[001/122] Collected UC 2.1 U1-0 LEGACY_BASELINE")
 
 
 def test_snapshot_files_keep_raw_xml_and_normalized_json(tmp_path: Path) -> None:

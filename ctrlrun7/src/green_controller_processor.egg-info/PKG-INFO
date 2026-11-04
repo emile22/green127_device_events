@@ -1,7 +1,0 @@
-Metadata-Version: 2.4
-Name: green-controller-processor
-Version: 0.1.0
-Requires-Python: >=3.11
-Requires-Dist: ncclient>=0.6.15
-Provides-Extra: test
-Requires-Dist: pytest>=8; extra == "test"

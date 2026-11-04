@@ -260,7 +260,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_6,
         "Consideration of other domains for obtention of end-to-end metrics",
-              None,
+        "Xdomains",
         (
             _event(EventSeries.UC_2_6, "U6-0", "DOMAIN_METRICS_AVAILABLE",
                    "Access and transport domains report metrics for one end-to-end service.",
@@ -285,7 +285,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_7,
         "Dynamic adjustment of network element throughput in wireless transport",
-              None,
+        "Dynamic",
         (
             _event(EventSeries.UC_2_7, "U7-0", "PEAK_TRAFFIC_LINK_POWER",
                    "Peak traffic configures the wireless transport link for its planned capacity.",
@@ -308,7 +308,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_8,
         "Video streaming use case",
-              "Video streaming",
+        "Video streaming",
         (
             _event(EventSeries.UC_2_8, "U8-0", "HIGH_UNICAST_DEMAND",
                    "Separate unicast streams increase repeated traffic across the backbone.",
@@ -332,7 +332,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_9,
         "WLAN Network Energy Saving",
-                       "WLAN",
+        "WLAN",
         (
             _event(EventSeries.UC_2_9, "U9-0", "AP_ACTIVE",
                    "The PoE-powered access point serves both radio bands at full operation.",
@@ -367,7 +367,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_10,
         "Fixed Network Energy Saving",
-              None,
+        "Fixed_Network",
         (
             _event(EventSeries.UC_2_10, "U10-0", "TRAFFIC_HIGH",
                    "High traffic keeps the router line card active at the normal power baseline.",
@@ -415,7 +415,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_12,
         "ISAC-enabled Energy-Aware Smart City Traffic Management",
-              "Smart-City",
+        "Smart-City",
         (
             _event(EventSeries.UC_2_12, "U12-0", "PEAK_HIGH_RESOLUTION_SENSING",
                    "High-resolution sensing supports detailed traffic awareness during peak conditions.",
@@ -445,7 +445,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_13,
         "Double Accounting Open issue",
-              None,
+        "2xAccounting",
         (
             _event(EventSeries.UC_2_13, "U13-0", "RAW_MEASUREMENTS",
                    "Measurements exist, but missing topology prevents reliable de-duplication.",
@@ -469,7 +469,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_14,
         "Energy Efficiency Under Power Shortage",
-              None,
+        "Shortage",
         (
             _event(EventSeries.UC_2_14, "U14-0", "GRID_NORMAL",
                    "Normal grid power lets every component and service operate without energy restrictions.",
@@ -512,7 +512,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_15,
         "Energy-Efficient Management of Distributed AI Training Workloads",
-              None,
+        "AI Training",
         (
             _event(EventSeries.UC_2_15, "U15-0", "TRAINING_FULL_CLUSTER",
                    "Active training nodes exchange East-West data across the cluster fabric.",
@@ -537,7 +537,7 @@ UC_CATALOG = (
     UseCaseSpec(
         EventSeries.UC_2_16,
         "Network-level Cross Layer Energy Saving",
-              "Cross-Layer",
+       "Cross-Layer",
         (
             _event(EventSeries.UC_2_16, "U16-0", "MULTILAYER_NORMAL",
                    "IP overlay and transport underlay carry normal service traffic.",

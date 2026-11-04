@@ -3,3 +3,5 @@ __pycache__/
 .pytest_cache/
 logs/*.xml
 logs/*.json
+runtime/pytest-tmp/
+*.egg-info/

@@ -2,7 +2,7 @@
 
 ## GAP-001 - UC 2.14 Energy Efficiency Under Power Shortage
 
-- Events: U14-0, U14-1, U14-2, U14-3, U14-4
+- Events: U14-0, U14-1, U14-2, U14-3, U14-4, U14-5, U14-6, U14-7, U14-8, U14-9
 - Requirement: Relate power-source and battery level to critical-service preservation and non-critical reduction.
 - Category: STATE-GAP
 - Scope: device operational state

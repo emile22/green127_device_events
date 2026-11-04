@@ -36,6 +36,9 @@ def load_event_catalog(path: Path | None = None) -> tuple[EventReference, ...]:
                 simulator_metadata=cells[8],
             )
         )
-    if len(events) != 61:
-        raise ValueError(f"expected 61 allrun5 Group A events, found {len(events)} in {source}")
+    if not events:
+        raise ValueError(f"allrun5 Group A event catalog is empty: {source}")
+    event_ids = [event.event_id for event in events]
+    if len(event_ids) != len(set(event_ids)):
+        raise ValueError(f"duplicate event IDs in allrun5 event catalog: {source}")
     return tuple(events)

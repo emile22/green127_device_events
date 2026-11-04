@@ -151,7 +151,11 @@ def test_analysis_reports_include_candidate_decisions_and_tree_artifacts(analysi
     summary_headers = [cell.strip() for cell in summary_table_lines[0].split("|")[1:-1]]
     assert summary_headers[2] == "Gap?"
     first_candidate_cells = [cell.strip() for cell in summary_table_lines[2].split("|")[1:-1]]
-    assert first_candidate_cells[:3] == ["UC 2.1", "U1-0, U1-1, U1-2, U1-3", "No"]
+    assert first_candidate_cells[:3] == [
+        "UC 2.1",
+        "U1-0, U1-1, U1-2, U1-3, U1-4, U1-5, U1-6, U1-7",
+        "No",
+    ]
     assert "UC 2.1: Incremental Application of the GREEN Framework" not in summary
     summary_cells = [
         [cell.strip() for cell in line.split("|")[1:-1]]

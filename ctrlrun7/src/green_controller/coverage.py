@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from green_controller.catalog import load_event_catalog
+
 MODULES = [
     "ietf-power-and-energy@2026-07-02",
     "ietf-hardware@2018-03-13",
@@ -44,7 +46,13 @@ CANDIDATES: tuple[dict[str, Any], ...] = (
 
 
 def candidates_for_green8() -> list[dict[str, Any]]:
-    return [dict(candidate) for candidate in CANDIDATES]
+    event_ids_by_uc: dict[str, list[str]] = {}
+    for event in load_event_catalog():
+        event_ids_by_uc.setdefault(event.uc, []).append(event.event_id)
+    return [
+        {**candidate, "event_ids": event_ids_by_uc[candidate["uc"]]}
+        for candidate in CANDIDATES
+    ]
 
 
 def write_coverage_artifacts(project_root: Path) -> list[dict[str, Any]]:

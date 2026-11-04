@@ -20,6 +20,7 @@ This repository is at the scaffold stage. The current implementation brief is [`
           +----------------+----------------+
           |                |                |
      device catalog   topology graph   stable identities
+     ietf-hardware    ietf-power-and-energy
           |                |                |
           +----------------+----------------+
                            |
@@ -35,6 +36,8 @@ This repository is at the scaffold stage. The current implementation brief is [`
           |                                 |
        controller                     discovery
         ctrlrun                         caprun
+swepcarl-green-controller-yang    claise-green-capability-discovery
+
     
     
 ## Design References

@@ -106,7 +106,7 @@ def _catalog_once(output: Path, view: str, fixture: Path | None) -> int:
         observations = observe_event_catalog(
             client,
             progress=lambda index, total, event: print(
-                f"[{index:02d}/{total}] Collected {event.uc} {event.event_id} {event.event_name}",
+                f"[{index:0{len(str(total))}d}/{total}] Collected {event.uc} {event.event_id} {event.event_name}",
                 flush=True,
             ),
         )

@@ -6,7 +6,11 @@
       "U1-0",
       "U1-1",
       "U1-2",
-      "U1-3"
+      "U1-3",
+      "U1-4",
+      "U1-5",
+      "U1-6",
+      "U1-7"
     ],
     "requirement": "Retain provenance and uncertainty for the legacy baseline when comparing it with later measurements.",
     "scope": "controller",
@@ -43,7 +47,12 @@
       "U2-1",
       "U2-2",
       "U2-3",
-      "U2-4"
+      "U2-4",
+      "U2-5",
+      "U2-6",
+      "U2-7",
+      "U2-8",
+      "U2-9"
     ],
     "requirement": "Relate traffic condition and service continuity to component power-state transitions.",
     "scope": "controller",
@@ -79,7 +88,11 @@
       "U5-0",
       "U5-1",
       "U5-2",
-      "U5-3"
+      "U5-3",
+      "U5-4",
+      "U5-5",
+      "U5-6",
+      "U5-7"
     ],
     "requirement": "Distinguish a direct target measurement from an external meter correlated with an uninstrumented target.",
     "scope": "controller",
@@ -116,7 +129,11 @@
       "U6-0",
       "U6-1",
       "U6-2",
-      "U6-3"
+      "U6-3",
+      "U6-4",
+      "U6-5",
+      "U6-6",
+      "U6-7"
     ],
     "requirement": "Normalize domain inputs and retain the composition and boundary-guard provenance of an end-to-end value.",
     "scope": "controller",
@@ -153,7 +170,11 @@
       "U7-0",
       "U7-1",
       "U7-2",
-      "U7-3"
+      "U7-3",
+      "U7-4",
+      "U7-5",
+      "U7-6",
+      "U7-7"
     ],
     "requirement": "Associate a radio throughput profile and traffic condition with observed link power.",
     "scope": "controller",
@@ -189,7 +210,11 @@
       "U8-0",
       "U8-1",
       "U8-2",
-      "U8-3"
+      "U8-3",
+      "U8-4",
+      "U8-5",
+      "U8-6",
+      "U8-7"
     ],
     "requirement": "Relate delivery strategy and cache placement to observed energy values without asserting a standardized control protocol.",
     "scope": "controller",
@@ -226,7 +251,12 @@
       "U9-1",
       "U9-2",
       "U9-3",
-      "U9-4"
+      "U9-4",
+      "U9-5",
+      "U9-6",
+      "U9-7",
+      "U9-8",
+      "U9-9"
     ],
     "requirement": "Relate AP power-state and PoE power changes to coverage and recovery-delay constraints.",
     "scope": "controller",
@@ -263,7 +293,11 @@
       "U10-0",
       "U10-1",
       "U10-2",
-      "U10-3"
+      "U10-3",
+      "U10-4",
+      "U10-5",
+      "U10-6",
+      "U10-7"
     ],
     "requirement": "Compare energy measurements over a defined interval and distinguish interval energy from cumulative counters.",
     "scope": "device",
@@ -300,7 +334,11 @@
       "U11-0",
       "U11-1",
       "U11-2",
-      "U11-3"
+      "U11-3",
+      "U11-4",
+      "U11-5",
+      "U11-6",
+      "U11-7"
     ],
     "requirement": "Preserve telemetry history and distinguish optimized, legacy, and unknown capability classifications.",
     "scope": "controller",
@@ -338,7 +376,12 @@
       "U12-1",
       "U12-2",
       "U12-3",
-      "U12-4"
+      "U12-4",
+      "U12-5",
+      "U12-6",
+      "U12-7",
+      "U12-8",
+      "U12-9"
     ],
     "requirement": "Relate sensing mode and energy-aware routing to the requirement that critical sensing remains active.",
     "scope": "controller",
@@ -374,7 +417,11 @@
       "U13-0",
       "U13-1",
       "U13-2",
-      "U13-3"
+      "U13-3",
+      "U13-4",
+      "U13-5",
+      "U13-6",
+      "U13-7"
     ],
     "requirement": "Determine whether a measurement boundary is complete and whether a de-duplicated accounting result is authoritative.",
     "scope": "controller",
@@ -412,7 +459,12 @@
       "U14-1",
       "U14-2",
       "U14-3",
-      "U14-4"
+      "U14-4",
+      "U14-5",
+      "U14-6",
+      "U14-7",
+      "U14-8",
+      "U14-9"
     ],
     "requirement": "Relate power-source and battery level to critical-service preservation and non-critical reduction.",
     "scope": "controller",
@@ -450,7 +502,11 @@
       "U15-0",
       "U15-1",
       "U15-2",
-      "U15-3"
+      "U15-3",
+      "U15-4",
+      "U15-5",
+      "U15-6",
+      "U15-7"
     ],
     "requirement": "Relate energy observations to scheduling window, active-node allocation, and data locality.",
     "scope": "controller",
@@ -488,7 +544,12 @@
       "U16-1",
       "U16-2",
       "U16-3",
-      "U16-4"
+      "U16-4",
+      "U16-5",
+      "U16-6",
+      "U16-7",
+      "U16-8",
+      "U16-9"
     ],
     "requirement": "Represent a cross-layer dependency check and preserve QoS during coordinated low-power transitions.",
     "scope": "controller",

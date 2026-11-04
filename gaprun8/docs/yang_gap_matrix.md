@@ -23,30 +23,30 @@
 
 ## Summary
 
-| UC      | Events                            | Gap?     | Scope                       | Coverage before | GAP ID  |
-| ------- | --------------------------------- | -------- | --------------------------- | --------------- | ------- |
-| UC 2.1  | U1-0, U1-1, U1-2, U1-3            | No       | controller                  | absent          | -       |
-| UC 2.2  | U2-0, U2-1, U2-2, U2-3, U2-4      | No       | controller                  | absent          | -       |
-| UC 2.5  | U5-0, U5-1, U5-2, U5-3            | No       | controller                  | partial         | -       |
-| UC 2.6  | U6-0, U6-1, U6-2, U6-3            | No       | controller                  | partial         | -       |
-| UC 2.7  | U7-0, U7-1, U7-2, U7-3            | No       | controller                  | absent          | -       |
-| UC 2.8  | U8-0, U8-1, U8-2, U8-3            | No       | controller                  | absent          | -       |
-| UC 2.9  | U9-0, U9-1, U9-2, U9-3, U9-4      | No       | controller                  | partial         | -       |
-| UC 2.10 | U10-0, U10-1, U10-2, U10-3        | No       | device                      | ambiguous       | -       |
-| UC 2.11 | U11-0, U11-1, U11-2, U11-3        | No       | controller                  | partial         | -       |
-| UC 2.12 | U12-0, U12-1, U12-2, U12-3, U12-4 | No       | controller                  | absent          | -       |
-| UC 2.13 | U13-0, U13-1, U13-2, U13-3        | No       | controller                  | partial         | -       |
-| UC 2.14 | U14-0, U14-1, U14-2, U14-3, U14-4 | Yes      | device operational state    | absent          | GAP-001 |
-| UC 2.15 | U15-0, U15-1, U15-2, U15-3        | No       | controller                  | absent          | -       |
-| UC 2.16 | U16-0, U16-1, U16-2, U16-3, U16-4 | No       | controller                  | partial         | -       |
-| UC 2.3  | -                                 | Deferred | controller/device reporting | underspecified  | -       |
-| UC 2.4  | -                                 | Deferred | controller/device reporting | underspecified  | -       |
+| UC      | Events                                                               | Gap?     | Scope                       | Coverage before | GAP ID  |
+| ------- | -------------------------------------------------------------------- | -------- | --------------------------- | --------------- | ------- |
+| UC 2.1  | U1-0, U1-1, U1-2, U1-3, U1-4, U1-5, U1-6, U1-7                       | No       | controller                  | absent          | -       |
+| UC 2.2  | U2-0, U2-1, U2-2, U2-3, U2-4, U2-5, U2-6, U2-7, U2-8, U2-9           | No       | controller                  | absent          | -       |
+| UC 2.5  | U5-0, U5-1, U5-2, U5-3, U5-4, U5-5, U5-6, U5-7                       | No       | controller                  | partial         | -       |
+| UC 2.6  | U6-0, U6-1, U6-2, U6-3, U6-4, U6-5, U6-6, U6-7                       | No       | controller                  | partial         | -       |
+| UC 2.7  | U7-0, U7-1, U7-2, U7-3, U7-4, U7-5, U7-6, U7-7                       | No       | controller                  | absent          | -       |
+| UC 2.8  | U8-0, U8-1, U8-2, U8-3, U8-4, U8-5, U8-6, U8-7                       | No       | controller                  | absent          | -       |
+| UC 2.9  | U9-0, U9-1, U9-2, U9-3, U9-4, U9-5, U9-6, U9-7, U9-8, U9-9           | No       | controller                  | partial         | -       |
+| UC 2.10 | U10-0, U10-1, U10-2, U10-3, U10-4, U10-5, U10-6, U10-7               | No       | device                      | ambiguous       | -       |
+| UC 2.11 | U11-0, U11-1, U11-2, U11-3, U11-4, U11-5, U11-6, U11-7               | No       | controller                  | partial         | -       |
+| UC 2.12 | U12-0, U12-1, U12-2, U12-3, U12-4, U12-5, U12-6, U12-7, U12-8, U12-9 | No       | controller                  | absent          | -       |
+| UC 2.13 | U13-0, U13-1, U13-2, U13-3, U13-4, U13-5, U13-6, U13-7               | No       | controller                  | partial         | -       |
+| UC 2.14 | U14-0, U14-1, U14-2, U14-3, U14-4, U14-5, U14-6, U14-7, U14-8, U14-9 | Yes      | device operational state    | absent          | GAP-001 |
+| UC 2.15 | U15-0, U15-1, U15-2, U15-3, U15-4, U15-5, U15-6, U15-7               | No       | controller                  | absent          | -       |
+| UC 2.16 | U16-0, U16-1, U16-2, U16-3, U16-4, U16-5, U16-6, U16-7, U16-8, U16-9 | No       | controller                  | partial         | -       |
+| UC 2.3  | -                                                                    | Deferred | controller/device reporting | underspecified  | -       |
+| UC 2.4  | -                                                                    | Deferred | controller/device reporting | underspecified  | -       |
 
 ## Candidate Details
 
 ### UC 2.1 Incremental Application of the GREEN Framework
 
-- Events: U1-0, U1-1, U1-2, U1-3
+- Events: U1-0, U1-1, U1-2, U1-3, U1-4, U1-5, U1-6, U1-7
 - Requirement: Retain provenance and uncertainty for the legacy baseline when comparing it with later measurements.
 - Scope: controller
 - Coverage before: absent
@@ -72,7 +72,7 @@
 
 ### UC 2.2 Selective reduction of energy consumption in network parts proportional to traffic levels
 
-- Events: U2-0, U2-1, U2-2, U2-3, U2-4
+- Events: U2-0, U2-1, U2-2, U2-3, U2-4, U2-5, U2-6, U2-7, U2-8, U2-9
 - Requirement: Relate traffic condition and service continuity to component power-state transitions.
 - Scope: controller
 - Coverage before: absent
@@ -98,7 +98,7 @@
 
 ### UC 2.5 Indirect Energy Monitoring and control
 
-- Events: U5-0, U5-1, U5-2, U5-3
+- Events: U5-0, U5-1, U5-2, U5-3, U5-4, U5-5, U5-6, U5-7
 - Requirement: Distinguish a direct target measurement from an external meter correlated with an uninstrumented target.
 - Scope: controller
 - Coverage before: partial
@@ -125,7 +125,7 @@
 
 ### UC 2.6 Consideration of other domains for obtention of end-to-end metrics
 
-- Events: U6-0, U6-1, U6-2, U6-3
+- Events: U6-0, U6-1, U6-2, U6-3, U6-4, U6-5, U6-6, U6-7
 - Requirement: Normalize domain inputs and retain the composition and boundary-guard provenance of an end-to-end value.
 - Scope: controller
 - Coverage before: partial
@@ -152,7 +152,7 @@
 
 ### UC 2.7 Dynamic adjustment of network element throughput according to traffic levels in wireless transport networks
 
-- Events: U7-0, U7-1, U7-2, U7-3
+- Events: U7-0, U7-1, U7-2, U7-3, U7-4, U7-5, U7-6, U7-7
 - Requirement: Associate a radio throughput profile and traffic condition with observed link power.
 - Scope: controller
 - Coverage before: absent
@@ -178,7 +178,7 @@
 
 ### UC 2.8 Video streaming use case
 
-- Events: U8-0, U8-1, U8-2, U8-3
+- Events: U8-0, U8-1, U8-2, U8-3, U8-4, U8-5, U8-6, U8-7
 - Requirement: Relate delivery strategy and cache placement to observed energy values without asserting a standardized control protocol.
 - Scope: controller
 - Coverage before: absent
@@ -204,7 +204,7 @@
 
 ### UC 2.9 WLAN Network Energy Saving
 
-- Events: U9-0, U9-1, U9-2, U9-3, U9-4
+- Events: U9-0, U9-1, U9-2, U9-3, U9-4, U9-5, U9-6, U9-7, U9-8, U9-9
 - Requirement: Relate AP power-state and PoE power changes to coverage and recovery-delay constraints.
 - Scope: controller
 - Coverage before: partial
@@ -231,7 +231,7 @@
 
 ### UC 2.10 Fixed Network Energy Saving
 
-- Events: U10-0, U10-1, U10-2, U10-3
+- Events: U10-0, U10-1, U10-2, U10-3, U10-4, U10-5, U10-6, U10-7
 - Requirement: Compare energy measurements over a defined interval and distinguish interval energy from cumulative counters.
 - Scope: device
 - Coverage before: ambiguous
@@ -258,7 +258,7 @@
 
 ### UC 2.11 Energy Efficiency Network Management
 
-- Events: U11-0, U11-1, U11-2, U11-3
+- Events: U11-0, U11-1, U11-2, U11-3, U11-4, U11-5, U11-6, U11-7
 - Requirement: Preserve telemetry history and distinguish optimized, legacy, and unknown capability classifications.
 - Scope: controller
 - Coverage before: partial
@@ -285,7 +285,7 @@
 
 ### UC 2.12 ISAC-enabled Energy-Aware Smart City Traffic Management
 
-- Events: U12-0, U12-1, U12-2, U12-3, U12-4
+- Events: U12-0, U12-1, U12-2, U12-3, U12-4, U12-5, U12-6, U12-7, U12-8, U12-9
 - Requirement: Relate sensing mode and energy-aware routing to the requirement that critical sensing remains active.
 - Scope: controller
 - Coverage before: absent
@@ -311,7 +311,7 @@
 
 ### UC 2.13 Double Accounting Open issue
 
-- Events: U13-0, U13-1, U13-2, U13-3
+- Events: U13-0, U13-1, U13-2, U13-3, U13-4, U13-5, U13-6, U13-7
 - Requirement: Determine whether a measurement boundary is complete and whether a de-duplicated accounting result is authoritative.
 - Scope: controller
 - Coverage before: partial
@@ -338,7 +338,7 @@
 
 ### UC 2.14 Energy Efficiency Under Power Shortage
 
-- Events: U14-0, U14-1, U14-2, U14-3, U14-4
+- Events: U14-0, U14-1, U14-2, U14-3, U14-4, U14-5, U14-6, U14-7, U14-8, U14-9
 - Requirement: Relate power-source and battery level to critical-service preservation and non-critical reduction.
 - Scope: device operational state
 - Coverage before: absent
@@ -366,7 +366,7 @@
 
 ### UC 2.15 Energy-Efficient Management of Distributed AI Training Workloads
 
-- Events: U15-0, U15-1, U15-2, U15-3
+- Events: U15-0, U15-1, U15-2, U15-3, U15-4, U15-5, U15-6, U15-7
 - Requirement: Relate energy observations to scheduling window, active-node allocation, and data locality.
 - Scope: controller
 - Coverage before: absent
@@ -393,7 +393,7 @@
 
 ### UC 2.16 Network-level Cross Layer Energy Saving
 
-- Events: U16-0, U16-1, U16-2, U16-3, U16-4
+- Events: U16-0, U16-1, U16-2, U16-3, U16-4, U16-5, U16-6, U16-7, U16-8, U16-9
 - Requirement: Represent a cross-layer dependency check and preserve QoS during coordinated low-power transitions.
 - Scope: controller
 - Coverage before: partial
