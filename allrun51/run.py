@@ -278,7 +278,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         if args.uc is None:
             tests = subprocess.run(
-                [python, "-m", "pytest", "-v"],
+                [python, "-m", "pytest"],
                 check=False,
                 stdin=subprocess.DEVNULL,
                 cwd=project_dir,
@@ -290,7 +290,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         else:
             print(
                 f"Skipping full pytest suite for selected {args.uc.value}; "
-                "run python -m pytest -v separately after code changes.",
+                "run python -m pytest separately after code changes.",
                 flush=True,
             )
 

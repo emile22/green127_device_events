@@ -223,7 +223,7 @@ def test_launcher_defaults_to_interactive_runtime(monkeypatch) -> None:
     monkeypatch.setattr(run, "pause_for_review", lambda *_args: None)
 
     assert run.main([]) == 0
-    assert commands[0] == ["project-python", "-m", "pytest", "-v"]
+    assert commands[0] == ["project-python", "-m", "pytest"]
     assert commands[1] == ["project-python", "-m", "green"]
     project_dir = Path(run.__file__).resolve().parent
     assert working_directories[:2] == [project_dir, project_dir]

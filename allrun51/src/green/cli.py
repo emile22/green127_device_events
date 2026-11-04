@@ -4,6 +4,10 @@ import time
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
+from rich.console import Console
+from rich.syntax import Syntax
+from rich.text import Text
+
 from green.accounting import AccountingEngine
 from green.catalog import EVENT_CATALOG, UC_CATALOG, USE_CASES_BY_SERIES
 from green.models import AccountingResult, EventSeries, SimulatedEvent
@@ -253,6 +257,31 @@ def _display_event(
         output_fn(line)
 
 
+def _rich_print(console: Console, message: str) -> None:
+    stripped = message.lstrip()
+    if stripped.startswith("{"):
+        console.print(Syntax(message, "json", word_wrap=True))
+        return
+    if stripped.startswith("<"):
+        console.print(Syntax(message, "xml", word_wrap=True))
+        return
+
+    text = Text(message)
+    if message.startswith("["):
+        text.stylize("bold green")
+    elif message.startswith("---"):
+        text.stylize("bold cyan")
+    elif message.startswith(("GREEN allrun51", "Group A completed", "Group B deferred")):
+        text.stylize("bold green")
+    elif message.startswith(("HW ", "ENERGY ", "REL ", "DIFF ", "ACCOUNT ")):
+        label, separator, details = message.partition(" ")
+        text = Text(label, style="bold cyan")
+        text.append(separator + details)
+    elif message.startswith("NETCONF") or message.startswith("Unknown command"):
+        text.stylize("yellow")
+    console.print(text)
+
+
 def _visible_energy_object_ids(
     simulator: EventSimulator,
     topology_ids: Sequence[str],
@@ -308,6 +337,10 @@ def main(
     args = parser.parse_args(argv)
     if args.interval < 0:
         parser.error("--interval must be non-negative")
+
+    if output_fn is print:
+        console = Console()
+        output_fn = lambda message: _rich_print(console, message)
 
     set_trace = trace_fn or set_netconf_trace_enabled
     try:
