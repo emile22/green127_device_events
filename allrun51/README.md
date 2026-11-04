@@ -132,7 +132,7 @@ To run only one implemented Group A use case, pass its number with `-u` or
 `--uc`, for example `py .\allrun51\run.py -u 2.13`. The same option works with
 `python -m green -u 2.13`. Supported selections are UC 2.1, 2.2, and 2.5–2.16;
 UC 2.3 and 2.4 remain deferred. A selected-UC run skips the full pytest suite
-to avoid rerunning it after a successful test-first run; run `python -m pytest -v`
+to avoid rerunning it after a successful test-first run; run `python -m pytest`
 separately after changing code.
 
 Controls:
@@ -169,7 +169,7 @@ To add an event to an existing Group A use case:
        ```powershell
        python -m green.catalog_docs
        python scripts/generate_docs.py
-       python -m pytest -v
+       python -m pytest
        python -m green --auto --interval 0
        ```
 
@@ -213,7 +213,7 @@ bash scripts/wsl-netconf-start.sh
 ## Tests and Validation
 
 ```powershell
-python -m pytest -v
+python -m pytest
 python -m green --auto --interval 0
 python -m green.catalog_docs
 python scripts/generate_docs.py
